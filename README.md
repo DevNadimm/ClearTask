@@ -19,8 +19,9 @@ ClearTask is a simple, clean, and powerful task management app built with **Flut
 
 ## 📱 UI Structure
 
-### Tabs (Top/Bottom):
+### Tabs:
 
+* All
 * Today
 * Tomorrow
 * Upcoming
