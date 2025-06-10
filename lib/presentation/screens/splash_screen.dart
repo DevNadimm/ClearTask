@@ -1,4 +1,6 @@
+import 'package:clear_task/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -45,7 +47,7 @@ class SplashScreen extends StatelessWidget {
                     height: 50,
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () => Get.offAll(() => const HomeScreen()),
                       label: const Text("Get Started"),
                       icon: const Icon(
                         HugeIcons.strokeRoundedArrowRight02,
