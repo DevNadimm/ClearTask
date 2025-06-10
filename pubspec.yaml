@@ -1,6 +1,6 @@
 name: clear_task
 description: A new Flutter project to manage and organize your tasks.
-publish_to: 'none' # Prevents accidental publishing to pub.dev
+publish_to: 'none'
 
 version: 1.0.0+1
 
@@ -15,23 +15,25 @@ dependencies:
   cupertino_icons: ^1.0.8
   hugeicons: ^0.0.11
 
-  # State management
+  # State Management
   flutter_bloc: ^9.1.1
   get: ^4.7.2
 
-  # Date & time formatting
+  # Date & Time Formatting
   intl: ^0.20.2
 
-  # Local database
+  # Local Database
   sqflite: ^2.4.1
   path: ^1.9.0
 
-  # Persistent storage
+  # Persistent Storage
   shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  # Code Linting
   flutter_lints: ^4.0.0
 
 flutter:
