@@ -1,18 +1,38 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/core/utils/formatter/date_formatter.dart';
+import 'package:clear_task/core/utils/helper_functions/get_empty_message.dart';
 import 'package:clear_task/data/models/task_model.dart';
 import 'package:flutter/material.dart';
 
 class TaskCard extends StatelessWidget {
+  final String tab;
   final List<Task> tasks;
   final Function(Task task) onToggleChange;
 
-  const TaskCard({super.key, required this.tasks, required this.onToggleChange});
+  const TaskCard(
+      {super.key,
+      required this.tab,
+      required this.tasks,
+      required this.onToggleChange});
 
   @override
   Widget build(BuildContext context) {
     if (tasks.isEmpty) {
-      return const Center(child: Text("No tasks"));
+      return Padding(
+        padding: const EdgeInsets.all(24),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                getEmptyMessage(tab),
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ),
+      );
     }
     return ListView.builder(
       itemCount: tasks.length,
@@ -57,8 +77,7 @@ class TaskCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     child: Text(
                       "${getTaskTypeEmoji(task.taskType)} ${task.taskType.toUpperCase()}",
                       style: const TextStyle(
