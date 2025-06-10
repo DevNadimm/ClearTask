@@ -9,11 +9,12 @@ class TaskCard extends StatelessWidget {
   final List<Task> tasks;
   final Function(Task task) onToggleChange;
 
-  const TaskCard(
-      {super.key,
-      required this.tab,
-      required this.tasks,
-      required this.onToggleChange});
+  const TaskCard({
+    super.key,
+    required this.tab,
+    required this.tasks,
+    required this.onToggleChange,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +52,7 @@ class TaskCard extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             title: Text(
               task.title,
               style: const TextStyle(
