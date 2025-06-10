@@ -2,7 +2,7 @@ import 'package:clear_task/core/utils/formatter/date_formatter.dart';
 import 'package:flutter/material.dart';
 
 class Task {
-  final int? id;
+  int? id;
   final String title;
   final String? dueDate;
   final String taskType;

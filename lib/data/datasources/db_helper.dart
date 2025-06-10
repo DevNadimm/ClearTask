@@ -31,6 +31,7 @@ class DBHelper {
   Future<Task> createTask(Task task) async {
     final Database db = await initDB();
     int id = await db.insert("tbl_task", Task.toMap(task));
+    task.id = id;
     debugPrint('➕ Inserted task with id: $id');
     return task;
   }
