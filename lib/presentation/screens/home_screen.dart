@@ -92,6 +92,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   builder: (context, state) {
                     if (state is TaskLoaded) {
                       return TaskCard(
+                        tab: title,
                         tasks: filteredTasks,
                         onToggleChange: (task) {
                           context.read<TaskBloc>().add(UpdateTaskCompletion(task: task));
