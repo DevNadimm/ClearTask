@@ -7,7 +7,8 @@ AppBarTheme appBarTheme = const AppBarTheme(
   scrolledUnderElevation: 0,
   centerTitle: false,
   titleTextStyle: TextStyle(
+    fontSize: 20,
+    color: AppColors.primaryFontColor,
     fontWeight: FontWeight.w600,
-    fontSize: 20
   ),
 );

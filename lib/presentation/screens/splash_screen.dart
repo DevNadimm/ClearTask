@@ -1,3 +1,4 @@
+import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/data/datasources/preferences_helper.dart';
 import 'package:clear_task/presentation/screens/home_screen.dart';
 import 'package:clear_task/presentation/screens/welcome_screen.dart';
@@ -86,7 +87,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     style: TextStyle(
                       fontSize: 34,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppColors.primaryFontColor,
                       letterSpacing: 1,
                     ),
                   ),
@@ -103,9 +104,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               child: Text(
                 "Simplify your day",
                 style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white70,
-                  letterSpacing: 0,
+                  fontSize: 16,
+                  color: AppColors.secondaryFontColor,
                 ),
               ),
             ),

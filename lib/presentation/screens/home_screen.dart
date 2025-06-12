@@ -1,10 +1,11 @@
+import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/core/utils/helper_functions/get_filtered_tasks.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
 import 'package:clear_task/presentation/blocs/task/task_state.dart';
 import 'package:clear_task/presentation/screens/celebrate_success_screen.dart';
 import 'package:clear_task/presentation/screens/create_task_screen.dart';
-import 'package:clear_task/presentation/widgets/task_list.dart';
+import 'package:clear_task/presentation/widgets/task_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -64,11 +65,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           controller: _tabController,
           isScrollable: true,
           splashBorderRadius: BorderRadius.circular(30),
-          indicatorColor: Theme.of(context).primaryColor,
+          indicatorColor: AppColors.primaryColor,
           indicatorWeight: 3,
-          labelColor: Theme.of(context).primaryColor,
-          unselectedLabelColor: Colors.grey.shade600,
-          labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          labelColor: AppColors.primaryColor,
+          unselectedLabelColor: AppColors.secondaryFontColor,
+          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
           tabs: _tabTitles.map((title) => Tab(text: title)).toList(),
         ),
@@ -94,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               controller: _tabController,
               children: _tabTitles.map((title) {
                 final filteredTasks = getFilteredTasks(title, state.tasks);
-                return TaskList(
+                return TaskListWidget(
                   tab: title,
                   tasks: filteredTasks,
                   onToggleChange: (task) {
@@ -128,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             );
           }
 
-          return const SizedBox(); // fallback
+          return const SizedBox();
         },
       ),
     );

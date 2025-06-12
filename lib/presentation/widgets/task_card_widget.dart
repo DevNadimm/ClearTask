@@ -10,11 +10,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:hugeicons/hugeicons.dart';
 
-class TaskCard extends StatelessWidget {
+class TaskCardWidget extends StatelessWidget {
   final Task task;
   final Function(Task task) onToggleChange;
 
-  const TaskCard({
+  const TaskCardWidget({
     super.key,
     required this.task,
     required this.onToggleChange,
