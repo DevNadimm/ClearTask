@@ -1,7 +1,7 @@
-import 'package:clear_task/data/models/task_model.dart';
-import 'package:clear_task/presentation/blocs/task_bloc.dart';
-import 'package:clear_task/presentation/blocs/task_event.dart';
-import 'package:clear_task/presentation/blocs/task_state.dart';
+import 'package:clear_task/core/utils/helper_functions/get_filtered_tasks.dart';
+import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
+import 'package:clear_task/presentation/blocs/task/task_event.dart';
+import 'package:clear_task/presentation/blocs/task/task_state.dart';
 import 'package:clear_task/presentation/screens/create_task_screen.dart';
 import 'package:clear_task/presentation/widgets/task_card.dart';
 import 'package:flutter/material.dart';
@@ -87,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             return TabBarView(
               controller: _tabController,
               children: _tabTitles.map((title) {
-                final filteredTasks = filterTasks(title, state.tasks);
+                final filteredTasks = getFilteredTasks(title, state.tasks);
                 return BlocBuilder<TaskBloc, TaskState>(
                   builder: (context, state) {
                     if (state is TaskLoaded) {

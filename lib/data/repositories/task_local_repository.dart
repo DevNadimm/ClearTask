@@ -1,7 +1,7 @@
 import 'package:clear_task/data/datasources/db_helper.dart';
 import 'package:clear_task/data/models/task_model.dart';
 
-class Repository {
+class TaskLocalRepository {
   final DBHelper dbHelper = DBHelper();
 
   Future<List<Task>> fetchTasks() => dbHelper.fetchTasks();

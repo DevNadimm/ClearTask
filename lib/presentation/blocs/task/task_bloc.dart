@@ -1,19 +1,19 @@
 import 'package:clear_task/core/constants/error_messages.dart';
 import 'package:clear_task/data/models/task_model.dart';
-import 'package:clear_task/data/repositories/repository.dart';
-import 'package:clear_task/presentation/blocs/task_event.dart';
-import 'package:clear_task/presentation/blocs/task_state.dart';
+import 'package:clear_task/data/repositories/task_local_repository.dart';
+import 'package:clear_task/presentation/blocs/task/task_event.dart';
+import 'package:clear_task/presentation/blocs/task/task_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TaskBloc extends Bloc<TaskEvent, TaskState> {
-  final Repository repository = Repository();
+  final TaskLocalRepository taskLocalRepository = TaskLocalRepository();
 
   TaskBloc() : super(TaskInitial()) {
     // Fetch all tasks
     on<FetchTasks>((event, emit) async {
       emit(TaskLoading());
       try {
-        final tasks = await repository.fetchTasks();
+        final tasks = await taskLocalRepository.fetchTasks();
         emit(TaskLoaded(tasks));
       } catch (e) {
         emit(TaskError(ErrorMessages.fetchFailed));
@@ -25,7 +25,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       final currentState = state;
       try {
         emit(TaskLoading());
-        Task newTask = await repository.createTask(event.task);
+        Task newTask = await taskLocalRepository.createTask(event.task);
 
         if (currentState is TaskLoaded) {
           final List<Task> updatedTasks = List.from(currentState.tasks)
@@ -51,7 +51,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
           final index = tasks.indexWhere((task) => task.id == event.task.id);
 
           if (index != -1) {
-            final updatedTask = await repository.updateTask(event.task);
+            final updatedTask = await taskLocalRepository.updateTask(event.task);
             tasks[index] = updatedTask;
             emit(TaskLoaded(tasks));
           } else {
@@ -71,7 +71,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
 
         if (currentState is TaskLoaded) {
           final List<Task> tasks = List.from(currentState.tasks);
-          await repository.deleteTask(event.id);
+          await taskLocalRepository.deleteTask(event.id);
           tasks.removeWhere((task) => task.id == event.id);
           emit(TaskLoaded(tasks));
         }
@@ -84,7 +84,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     on<DeleteAllTasks>((event, emit) async {
       emit(TaskLoading());
       try {
-        await repository.deleteAllTasks();
+        await taskLocalRepository.deleteAllTasks();
         emit(TaskLoaded([]));
       } catch (e) {
         emit(TaskError(ErrorMessages.deleteAllFailed));
@@ -100,7 +100,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
           Task updatedTask = event.task;
           updatedTask.isCompleted = !updatedTask.isCompleted;
 
-          await repository.updateTask(updatedTask);
+          await taskLocalRepository.updateTask(updatedTask);
 
           List<Task> updatedTasks = currentState.tasks.map((task) {
             return task.id == updatedTask.id ? updatedTask : task;

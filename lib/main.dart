@@ -1,5 +1,5 @@
 import 'package:clear_task/core/utils/theme/theme.dart';
-import 'package:clear_task/presentation/blocs/task_bloc.dart';
+import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';

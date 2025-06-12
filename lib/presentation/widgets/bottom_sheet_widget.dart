@@ -1,5 +1,5 @@
 import 'package:clear_task/core/constants/colors.dart';
-import 'package:clear_task/data/models/task_model.dart';
+import 'package:clear_task/core/utils/helper_functions/get_task_type_emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hugeicons/hugeicons.dart';
