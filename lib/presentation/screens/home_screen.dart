@@ -3,7 +3,7 @@ import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
 import 'package:clear_task/presentation/blocs/task/task_state.dart';
 import 'package:clear_task/presentation/screens/create_task_screen.dart';
-import 'package:clear_task/presentation/widgets/task_card.dart';
+import 'package:clear_task/presentation/widgets/task_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -91,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 return BlocBuilder<TaskBloc, TaskState>(
                   builder: (context, state) {
                     if (state is TaskLoaded) {
-                      return TaskCard(
+                      return TaskList(
                         tab: title,
                         tasks: filteredTasks,
                         onToggleChange: (task) {
