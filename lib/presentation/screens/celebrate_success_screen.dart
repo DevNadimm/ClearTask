@@ -40,7 +40,7 @@ class CelebrateSuccessScreen extends StatelessWidget {
                 'You’ve completed all your tasks successfully.\nKeep up the great work!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   color: AppColors.secondaryFontColor,
                 ),
               ),
