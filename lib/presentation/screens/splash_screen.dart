@@ -31,8 +31,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   Future<void> _navigateToNextScreen() async {
-    final PreferencesHelper sharedPrefService = PreferencesHelper();
-    final futurePrefs = sharedPrefService.isFirstTimeUser();
+    final PreferencesHelper prefHelper = PreferencesHelper();
+    final futurePrefs = prefHelper.isFirstTimeUser();
 
     await Future.delayed(const Duration(seconds: 2));
     final bool isFirstTimeUser = await futurePrefs;
@@ -40,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     if (!mounted) return;
 
     if (isFirstTimeUser) {
-      await sharedPrefService.setUserVisited();
+      await prefHelper.setUserVisited();
       Get.offAll(() => const WelcomeScreen());
     } else {
       Get.offAll(() => const HomeScreen());
