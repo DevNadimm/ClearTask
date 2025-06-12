@@ -10,10 +10,10 @@ class CreateTask extends TaskEvent {
   CreateTask(this.task);
 }
 
-class EditTask extends TaskEvent {
+class UpdateTask extends TaskEvent {
   final Task task;
 
-  EditTask(this.task);
+  UpdateTask(this.task);
 }
 
 class DeleteTask extends TaskEvent {
@@ -24,8 +24,10 @@ class DeleteTask extends TaskEvent {
 
 class DeleteAllTasks extends TaskEvent {}
 
-class UpdateTaskCompletion extends TaskEvent {
+class ToggleTaskCompletion extends TaskEvent {
   final Task task;
 
-  UpdateTaskCompletion({required this.task});
+  ToggleTaskCompletion({required this.task});
 }
+
+class CelebrateAllTasksCompleted extends TaskEvent {}

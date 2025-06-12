@@ -2,6 +2,7 @@ import 'package:clear_task/core/utils/helper_functions/get_filtered_tasks.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
 import 'package:clear_task/presentation/blocs/task/task_state.dart';
+import 'package:clear_task/presentation/screens/celebrate_success_screen.dart';
 import 'package:clear_task/presentation/screens/create_task_screen.dart';
 import 'package:clear_task/presentation/widgets/task_list.dart';
 import 'package:flutter/material.dart';
@@ -77,7 +78,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         onPressed: () => Get.to(() => const CreateTaskScreen()),
         child: const Icon(HugeIcons.strokeRoundedTaskAdd01, size: 30),
       ),
-      body: BlocBuilder<TaskBloc, TaskState>(
+      body: BlocConsumer<TaskBloc, TaskState>(
+        listener: (context, state) {
+          if (state is CelebrateSuccess) {
+            Get.offAll(() => const CelebrateSuccessScreen());
+          }
+        },
         builder: (context, state) {
           if (state is TaskLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -88,18 +94,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               controller: _tabController,
               children: _tabTitles.map((title) {
                 final filteredTasks = getFilteredTasks(title, state.tasks);
-                return BlocBuilder<TaskBloc, TaskState>(
-                  builder: (context, state) {
-                    if (state is TaskLoaded) {
-                      return TaskList(
-                        tab: title,
-                        tasks: filteredTasks,
-                        onToggleChange: (task) {
-                          context.read<TaskBloc>().add(UpdateTaskCompletion(task: task));
-                        },
-                      );
-                    }
-                    return const Center(child: CircularProgressIndicator());
+                return TaskList(
+                  tab: title,
+                  tasks: filteredTasks,
+                  onToggleChange: (task) {
+                    context.read<TaskBloc>().add(ToggleTaskCompletion(task: task));
                   },
                 );
               }).toList(),
@@ -119,7 +118,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       state.errorMessage,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w600),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),

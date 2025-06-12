@@ -41,7 +41,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     });
 
     // Edit/update an existing task
-    on<EditTask>((event, emit) async {
+    on<UpdateTask>((event, emit) async {
       final currentState = state;
       try {
         emit(TaskLoading());
@@ -91,8 +91,8 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       }
     });
 
-    // Update task completion
-    on<UpdateTaskCompletion>((event, emit) async {
+    // Toggle task completion
+    on<ToggleTaskCompletion>((event, emit) async {
       final currentState = state;
 
       if (currentState is TaskLoaded) {
@@ -107,10 +107,19 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
           }).toList();
 
           emit(TaskLoaded(updatedTasks));
+
+          bool isAllCompleted = updatedTasks.length > 1 && updatedTasks.every((task) => task.isCompleted);
+          if (isAllCompleted) {
+            add(CelebrateAllTasksCompleted());
+          }
         } catch (e) {
           emit(currentState);
         }
       }
+    });
+
+    on<CelebrateAllTasksCompleted>((event, emit) {
+      emit(CelebrateSuccess());
     });
   }
 }

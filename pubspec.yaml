@@ -15,6 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   hugeicons: ^0.0.11
   flutter_launcher_icons: ^0.14.3
+  lottie: ^3.2.0
 
   # State Management
   flutter_bloc: ^9.1.1
@@ -43,6 +44,7 @@ flutter:
   assets:
     - assets/icons/
     - assets/illustration/
+    - assets/animations/
 
 flutter_launcher_icons:
   android: true

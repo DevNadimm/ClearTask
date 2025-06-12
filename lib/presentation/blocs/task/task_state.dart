@@ -17,3 +17,5 @@ class TaskError extends TaskState {
 
   TaskError(this.errorMessage);
 }
+
+class CelebrateSuccess extends TaskState {}
