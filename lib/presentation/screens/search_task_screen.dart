@@ -45,6 +45,10 @@ class _SearchTaskScreenState extends State<SearchTaskScreen> {
           ),
         ),
         title: _buildSearchField(),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(8),
+          child: SizedBox(height: 8),
+        ),
       ),
       body: BlocBuilder<TaskBloc, TaskState>(
         builder: (context, state) {
