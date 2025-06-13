@@ -20,8 +20,8 @@ class _SearchTaskScreenState extends State<SearchTaskScreen> {
 
   @override
   void initState() {
-    context.read<TaskBloc>().add(FetchTasks());
     super.initState();
+    context.read<TaskBloc>().add(FetchTasks());
   }
 
   @override
@@ -33,57 +33,21 @@ class _SearchTaskScreenState extends State<SearchTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: AppColors.backgroundColor,
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              context.read<TaskBloc>().add(FetchTasks());
-              Get.back();
-            },
-            icon: const Icon(
-              HugeIcons.strokeRoundedArrowLeft01,
-              size: 34,
-            ),
-          ),
-          title: TextField(
-            controller: _searchController,
-            style: const TextStyle(color: Colors.white),
-            onChanged: (value) {
-              context.read<TaskBloc>().add(SearchTasks(value));
-            },
-            decoration: InputDecoration(
-              hintText: 'Search tasks...',
-              hintStyle: const TextStyle(color: Colors.white54),
-              filled: true,
-              fillColor: AppColors.cardColor,
-              prefixIcon: const Icon(HugeIcons.strokeRoundedSearch02, color: Colors.white70),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(HugeIcons.strokeRoundedCancel01, color: Colors.white70),
-                      onPressed: () {
-                        _searchController.clear();
-                        FocusScope.of(context).unfocus();
-                        context.read<TaskBloc>().add(FetchTasks());
-                      },
-                    )
-                  : null,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 0),
-            ),
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            context.read<TaskBloc>().add(FetchTasks());
+            Get.back();
+          },
+          icon: const Icon(
+            HugeIcons.strokeRoundedArrowLeft01,
+            size: 34,
           ),
         ),
-        body: BlocBuilder<TaskBloc, TaskState>(builder: (context, state) {
+        title: _buildSearchField(),
+      ),
+      body: BlocBuilder<TaskBloc, TaskState>(
+        builder: (context, state) {
           if (state is TaskLoading) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -123,6 +87,46 @@ class _SearchTaskScreenState extends State<SearchTaskScreen> {
           }
 
           return const SizedBox();
-        }));
+        },
+      ),
+    );
+  }
+
+  Widget _buildSearchField() {
+    return TextField(
+      controller: _searchController,
+      style: const TextStyle(color: Colors.white),
+      onChanged: (value) {
+        context.read<TaskBloc>().add(SearchTasks(value));
+      },
+      decoration: InputDecoration(
+        hintText: 'Search tasks...',
+        hintStyle: const TextStyle(color: Colors.white54),
+        filled: true,
+        fillColor: AppColors.cardColor,
+        prefixIcon: const Icon(HugeIcons.strokeRoundedSearch02, color: Colors.white70),
+        suffixIcon: _searchController.text.isNotEmpty
+            ? IconButton(
+                icon: const Icon(HugeIcons.strokeRoundedCancel01, color: Colors.white70),
+                onPressed: () {
+                  _searchController.clear();
+                  FocusScope.of(context).unfocus();
+                  context.read<TaskBloc>().add(FetchTasks());
+                },
+              )
+            : null,
+        border: _buildOutlineInputBorder(),
+        enabledBorder: _buildOutlineInputBorder(),
+        focusedBorder: _buildOutlineInputBorder(),
+        contentPadding: const EdgeInsets.symmetric(vertical: 0),
+      ),
+    );
+  }
+
+  OutlineInputBorder _buildOutlineInputBorder () {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide.none,
+    );
   }
 }
