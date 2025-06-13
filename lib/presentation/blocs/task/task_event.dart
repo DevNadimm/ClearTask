@@ -31,3 +31,9 @@ class ToggleTaskCompletion extends TaskEvent {
 }
 
 class CelebrateAllTasksCompleted extends TaskEvent {}
+
+class SearchTasks extends TaskEvent {
+  final String query;
+
+  SearchTasks(this.query);
+}

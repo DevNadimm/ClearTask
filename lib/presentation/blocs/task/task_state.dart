@@ -6,10 +6,10 @@ class TaskInitial extends TaskState {}
 
 class TaskLoading extends TaskState {}
 
-class TaskLoaded extends TaskState {
+class TasksLoaded extends TaskState {
   final List<Task> tasks;
 
-  TaskLoaded(this.tasks);
+  TasksLoaded(this.tasks);
 }
 
 class TaskError extends TaskState {

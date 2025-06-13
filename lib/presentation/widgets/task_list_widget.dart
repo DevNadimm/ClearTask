@@ -9,12 +9,29 @@ class TaskListWidget extends StatelessWidget {
   final List<Task> tasks;
   final Function(Task task) onToggleChange;
 
+  /// Whether to show the empty message based on the current tab (e.g., All, Today, Completed)
+  final bool showTabEmptyMessage;
+
+  /// Whether the list is currently in search mode
+  final bool isInSearchMode;
+
   const TaskListWidget({
     super.key,
-    required this.tab,
+    this.tab = "All",
     required this.tasks,
     required this.onToggleChange,
+    this.showTabEmptyMessage = true,
+    this.isInSearchMode = false,
   });
+
+  final String searchNotFoundMessage = "No tasks found!\nPlease try a different keyword.";
+  final String noTasksMessage = "No tasks yet!\nStart by creating a new one.";
+
+  String _buildEmptyStateMessage() {
+    if (showTabEmptyMessage) return getEmptyMessage(tab);
+    if (isInSearchMode) return searchNotFoundMessage;
+    return noTasksMessage;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +43,7 @@ class TaskListWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                getEmptyMessage(tab),
+                _buildEmptyStateMessage(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 14,
@@ -39,6 +56,7 @@ class TaskListWidget extends StatelessWidget {
         ),
       );
     }
+
     return ListView.builder(
       itemCount: tasks.length,
       padding: const EdgeInsets.symmetric(vertical: 8),

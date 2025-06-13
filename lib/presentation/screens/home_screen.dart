@@ -5,6 +5,7 @@ import 'package:clear_task/presentation/blocs/task/task_event.dart';
 import 'package:clear_task/presentation/blocs/task/task_state.dart';
 import 'package:clear_task/presentation/screens/celebrate_success_screen.dart';
 import 'package:clear_task/presentation/screens/create_task_screen.dart';
+import 'package:clear_task/presentation/screens/search_task_screen.dart';
 import 'package:clear_task/presentation/widgets/task_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -47,11 +48,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            onPressed: () {}, icon: const Icon(HugeIcons.strokeRoundedMenu02)),
+          onPressed: () {},
+          icon: const Icon(HugeIcons.strokeRoundedMenu02),
+        ),
         actions: [
           IconButton(
-              onPressed: () {},
-              icon: const Icon(HugeIcons.strokeRoundedSearch02)),
+            onPressed: () => Get.to(() => const SearchTaskScreen()),
+            icon: const Icon(HugeIcons.strokeRoundedSearch02),
+          ),
           const Padding(
             padding: EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
@@ -90,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (state is TaskLoaded) {
+          if (state is TasksLoaded) {
             return TabBarView(
               controller: _tabController,
               children: _tabTitles.map((title) {

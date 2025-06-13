@@ -14,7 +14,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       emit(TaskLoading());
       try {
         final tasks = await taskLocalRepository.fetchTasks();
-        emit(TaskLoaded(tasks));
+        emit(TasksLoaded(tasks));
       } catch (e) {
         emit(TaskError(ErrorMessages.fetchFailed));
       }
@@ -27,13 +27,13 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         emit(TaskLoading());
         Task newTask = await taskLocalRepository.createTask(event.task);
 
-        if (currentState is TaskLoaded) {
+        if (currentState is TasksLoaded) {
           final List<Task> updatedTasks = List.from(currentState.tasks)
             ..add(newTask);
-          emit(TaskLoaded(updatedTasks));
+          emit(TasksLoaded(updatedTasks));
         } else {
           // If no tasks loaded yet, start with new task
-          emit(TaskLoaded([newTask]));
+          emit(TasksLoaded([newTask]));
         }
       } catch (e) {
         emit(TaskError(ErrorMessages.createFailed));
@@ -46,14 +46,14 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       try {
         emit(TaskLoading());
 
-        if (currentState is TaskLoaded) {
+        if (currentState is TasksLoaded) {
           final List<Task> tasks = List.from(currentState.tasks);
           final index = tasks.indexWhere((task) => task.id == event.task.id);
 
           if (index != -1) {
             final updatedTask = await taskLocalRepository.updateTask(event.task);
             tasks[index] = updatedTask;
-            emit(TaskLoaded(tasks));
+            emit(TasksLoaded(tasks));
           } else {
             emit(TaskError(ErrorMessages.taskNotFound));
           }
@@ -69,11 +69,11 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       try {
         emit(TaskLoading());
 
-        if (currentState is TaskLoaded) {
+        if (currentState is TasksLoaded) {
           final List<Task> tasks = List.from(currentState.tasks);
           await taskLocalRepository.deleteTask(event.id);
           tasks.removeWhere((task) => task.id == event.id);
-          emit(TaskLoaded(tasks));
+          emit(TasksLoaded(tasks));
         }
       } catch (e) {
         emit(TaskError(ErrorMessages.deleteFailed));
@@ -85,7 +85,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       emit(TaskLoading());
       try {
         await taskLocalRepository.deleteAllTasks();
-        emit(TaskLoaded([]));
+        emit(TasksLoaded([]));
       } catch (e) {
         emit(TaskError(ErrorMessages.deleteAllFailed));
       }
@@ -95,7 +95,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     on<ToggleTaskCompletion>((event, emit) async {
       final currentState = state;
 
-      if (currentState is TaskLoaded) {
+      if (currentState is TasksLoaded) {
         try {
           Task updatedTask = event.task;
           updatedTask.isCompleted = !updatedTask.isCompleted;
@@ -106,7 +106,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
             return task.id == updatedTask.id ? updatedTask : task;
           }).toList();
 
-          emit(TaskLoaded(updatedTasks));
+          emit(TasksLoaded(updatedTasks));
 
           bool isAllCompleted = updatedTasks.length > 1 && updatedTasks.every((task) => task.isCompleted);
           if (isAllCompleted) {
@@ -118,8 +118,25 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       }
     });
 
+    // Celebrate all task completed
     on<CelebrateAllTasksCompleted>((event, emit) {
       emit(CelebrateSuccess());
+    });
+
+    // Search tasks
+    on<SearchTasks>((event, emit) async {
+      try {
+        List<Task> allTasks = await taskLocalRepository.fetchTasks();
+        String query = event.query.toLowerCase();
+
+        List<Task> filtered = allTasks.where((task) {
+          return task.title.toLowerCase().contains(query);
+        }).toList();
+
+        emit(TasksLoaded(filtered));
+      } catch (e) {
+        emit(TaskError(ErrorMessages.fetchFailed));
+      }
     });
   }
 }

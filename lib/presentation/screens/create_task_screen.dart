@@ -7,6 +7,8 @@ import 'package:clear_task/presentation/widgets/bottom_sheet_widget.dart';
 import 'package:clear_task/presentation/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 
 class CreateTaskScreen extends StatefulWidget {
@@ -32,7 +34,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       );
 
       context.read<TaskBloc>().add(CreateTask(task));
-      Navigator.pop(context);
+      Get.back();
     }
   }
 
@@ -40,6 +42,13 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => Get.back(),
+          icon: const Icon(
+            HugeIcons.strokeRoundedArrowLeft01,
+            size: 34,
+          ),
+        ),
         title: const Text("Add Task"),
       ),
       body: SingleChildScrollView(
