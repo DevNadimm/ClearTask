@@ -1,12 +1,9 @@
 import 'package:clear_task/core/constants/error_messages.dart';
-import 'package:clear_task/core/utils/widgets/custom_snack_bar.dart';
 import 'package:clear_task/data/models/task_model.dart';
 import 'package:clear_task/data/repositories/task_local_repository.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
 import 'package:clear_task/presentation/blocs/task/task_state.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path/path.dart';
 
 class TaskBloc extends Bloc<TaskEvent, TaskState> {
   final TaskLocalRepository taskLocalRepository = TaskLocalRepository();
