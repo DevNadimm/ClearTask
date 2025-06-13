@@ -17,16 +17,21 @@ class SearchTaskScreen extends StatefulWidget {
 
 class _SearchTaskScreenState extends State<SearchTaskScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     context.read<TaskBloc>().add(FetchTasks());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _searchFocusNode.requestFocus();
+    });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -99,6 +104,7 @@ class _SearchTaskScreenState extends State<SearchTaskScreen> {
   Widget _buildSearchField() {
     return TextField(
       controller: _searchController,
+      focusNode: _searchFocusNode,
       style: const TextStyle(color: Colors.white),
       onChanged: (value) {
         context.read<TaskBloc>().add(SearchTasks(value));
