@@ -19,3 +19,11 @@ class TaskError extends TaskState {
 }
 
 class CelebrateSuccess extends TaskState {}
+
+class TaskDeleted extends TaskState {}
+
+class AllTasksDeleted extends TaskState {}
+
+class TaskCreated extends TaskState {}
+
+class TaskUpdated extends TaskState {}

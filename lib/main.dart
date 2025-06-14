@@ -14,8 +14,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => TaskBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => TaskBloc()),
+      ],
       child: GetMaterialApp(
         title: 'ClearTask',
         theme: theme,

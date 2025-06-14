@@ -1,10 +1,11 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/core/utils/helper_functions/get_filtered_tasks.dart';
+import 'package:clear_task/core/utils/widgets/task_snackbar_helper.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
 import 'package:clear_task/presentation/blocs/task/task_state.dart';
 import 'package:clear_task/presentation/screens/celebrate_success_screen.dart';
-import 'package:clear_task/presentation/screens/create_task_screen.dart';
+import 'package:clear_task/presentation/screens/create_task/create_task_screen.dart';
 import 'package:clear_task/presentation/screens/search_task_screen.dart';
 import 'package:clear_task/presentation/widgets/task_list_widget.dart';
 import 'package:flutter/material.dart';
@@ -87,6 +88,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         listener: (context, state) {
           if (state is CelebrateSuccess) {
             Get.offAll(() => const CelebrateSuccessScreen());
+          }
+
+          if (state is AllTasksDeleted) {
+            TaskSnackBarHelper.showDeleteAllSuccess();
+          }
+
+          if (state is TaskDeleted) {
+            TaskSnackBarHelper.showDeleteSuccess();
+          }
+
+          if (state is TaskCreated) {
+            TaskSnackBarHelper.showCreateSuccess();
+          }
+
+          if (state is TaskUpdated) {
+            TaskSnackBarHelper.showUpdateSuccess();
           }
         },
         builder: (context, state) {

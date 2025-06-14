@@ -30,6 +30,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         emit(TaskLoading());
         Task newTask = await taskLocalRepository.createTask(event.task);
         _cachedTasks.add(newTask);
+        emit(TaskCreated());
         emit(TasksLoaded(List.from(_cachedTasks)));
       } catch (e) {
         emit(TaskError(ErrorMessages.createFailed));
@@ -45,6 +46,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         if (index != -1) {
           final updatedTask = await taskLocalRepository.updateTask(event.task);
           _cachedTasks[index] = updatedTask;
+          emit(TaskUpdated());
           emit(TasksLoaded(List.from(_cachedTasks)));
         } else {
           emit(TaskError(ErrorMessages.taskNotFound));
@@ -60,6 +62,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         // emit(TaskLoading());
         await taskLocalRepository.deleteTask(event.id);
         _cachedTasks.removeWhere((task) => task.id == event.id);
+        emit(TaskDeleted());
         emit(TasksLoaded(List.from(_cachedTasks)));
       } catch (e) {
         emit(TaskError(ErrorMessages.deleteFailed));
@@ -72,6 +75,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       try {
         await taskLocalRepository.deleteAllTasks();
         _cachedTasks.clear(); // Clear cache
+        emit(AllTasksDeleted());
         emit(TasksLoaded([]));
       } catch (e) {
         emit(TaskError(ErrorMessages.deleteAllFailed));
