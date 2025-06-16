@@ -5,7 +5,6 @@ import 'package:clear_task/core/utils/helper_functions/get_task_type_emoji.dart'
 import 'package:clear_task/data/models/task_model.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
-import 'package:clear_task/presentation/screens/update_task/update_task_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -120,101 +119,97 @@ class TaskCardWidget extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (_) {
-        return Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: 4,
-                width: 50,
-                decoration: BoxDecoration(
-                  color: AppColors.secondaryFontColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              const SizedBox(height: 8),
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 12),
-                tileColor: AppColors.cardColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                title: Text(
-                  task.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+        return Material(
+          color: AppColors.cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  height: 4,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    color: AppColors.secondaryFontColor,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 6),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(HugeIcons.strokeRoundedCalendar03, size: 16, color: AppColors.secondaryFontColor.withOpacity(0.8)),
-                        const SizedBox(width: 4),
-                        Text(
-                          task.dueDate != null
-                              ? "Due: ${DateFormatter.toLongMonthDayYear(task.dueDate.toString())}"
-                              : "Due: Anytime",
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.secondaryFontColor,
-                          ),
-                        ),
-                      ],
+                const SizedBox(height: 8),
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 12),
+                  tileColor: AppColors.backgroundColor.withOpacity(0.6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  title: Text(
+                    task.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-                    if (task.sendNotification)
-                      Column(
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 6),
+                      const SizedBox(height: 6),
+                      Row(
                         children: [
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(HugeIcons.strokeRoundedNotification03, size: 16, color: AppColors.secondaryFontColor.withOpacity(0.8)),
-                              const SizedBox(width: 4),
-                              Text(
-                                "Notification: ${DateFormatter.toLongMonthDayYearTime(task.notificationTime.toString())}",
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.secondaryFontColor,
-                                ),
-                              ),
-                            ],
+                          Icon(HugeIcons.strokeRoundedCalendar03, size: 16, color: AppColors.secondaryFontColor.withOpacity(0.8)),
+                          const SizedBox(width: 4),
+                          Text(
+                            task.dueDate != null
+                                ? "Due: ${DateFormatter.toLongMonthDayYear(task.dueDate.toString())}"
+                                : "Due: Anytime",
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppColors.secondaryFontColor,
+                            ),
                           ),
                         ],
                       ),
-                  ],
+                      if (task.sendNotification)
+                        Column(
+                          children: [
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(HugeIcons.strokeRoundedNotification03, size: 16, color: AppColors.secondaryFontColor.withOpacity(0.8)),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "Notification: ${DateFormatter.toLongMonthDayYearTime(task.notificationTime.toString())}",
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.secondaryFontColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () => Get.to(() => UpdateTaskScreen(task: task)),
-                icon: const Icon(HugeIcons.strokeRoundedEdit03, size: 18),
-                label: const Text("Update Task"),
-                iconAlignment: IconAlignment.end,
-                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton.icon(
-                onPressed: () {
-                  Get.back();
-                  context.read<TaskBloc>().add(DeleteTask(task.id!));
-                },
-                icon: const Icon(HugeIcons.strokeRoundedDelete02, size: 18),
-                label: const Text("Delete Task"),
-                iconAlignment: IconAlignment.end,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size.fromHeight(50),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Get.back();
+                    context.read<TaskBloc>().add(DeleteTask(task.id!));
+                  },
+                  icon: const Icon(HugeIcons.strokeRoundedDelete02, size: 18),
+                  label: const Text("Delete Task"),
+                  iconAlignment: IconAlignment.end,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size.fromHeight(50),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
