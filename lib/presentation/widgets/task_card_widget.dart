@@ -5,6 +5,7 @@ import 'package:clear_task/core/utils/helper_functions/get_task_type_emoji.dart'
 import 'package:clear_task/data/models/task_model.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
+import 'package:clear_task/presentation/screens/update_task/update_task_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -192,9 +193,9 @@ class TaskCardWidget extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () => Get.to(() => UpdateTaskScreen(task: task)),
                 icon: const Icon(HugeIcons.strokeRoundedEdit03, size: 18),
-                label: const Text("Edit Task"),
+                label: const Text("Update Task"),
                 iconAlignment: IconAlignment.end,
                 style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
               ),
