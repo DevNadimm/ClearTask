@@ -87,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       body: BlocConsumer<TaskBloc, TaskState>(
         listener: (context, state) {
           if (state is CelebrateSuccess) {
-            Get.offAll(() => const CelebrateSuccessScreen());
+            Get.to(() => const CelebrateSuccessScreen());
           }
 
           if (state is AllTasksDeleted) {

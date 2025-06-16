@@ -106,6 +106,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     // Celebrate all tasks completed
     on<CelebrateAllTasksCompleted>((event, emit) {
       emit(CelebrateSuccess());
+      emit(TasksLoaded(_cachedTasks));
     });
 
     // Search Tasks

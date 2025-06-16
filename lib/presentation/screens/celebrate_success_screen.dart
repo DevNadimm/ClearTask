@@ -65,9 +65,7 @@ class CelebrateSuccessScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               TextButton(
-                onPressed: () {
-                  Get.offAll(() => const HomeScreen());
-                },
+                onPressed: () => Get.back(),
                 child: const Text(
                   'Skip',
                   style: TextStyle(color: AppColors.secondaryFontColor),
