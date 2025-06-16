@@ -27,6 +27,6 @@ class AppColors {
   static const Color cardOverlay = Color(0x55232323); // 33% opacity
 
   // Input Border Color
-  static const Color inputBorderColor = Color(0xff7f7093);
+  static const Color inputBorderColor = Color(0xff575161);
   static const Color inputBorderFocusedColor = Color(0xffc496fd);
 }

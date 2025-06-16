@@ -5,6 +5,8 @@ InputDecorationTheme inputDecorationTheme = InputDecorationTheme(
   errorMaxLines: 3,
   prefixIconColor: AppColors.secondaryFontColor,
   suffixIconColor: AppColors.secondaryFontColor,
+  fillColor: AppColors.cardColor,
+  filled: true,
   labelStyle: const TextStyle().copyWith(fontSize: 14, color: AppColors.secondaryFontColor),
   hintStyle: const TextStyle().copyWith(fontSize: 14, color: AppColors.secondaryFontColor),
   errorStyle: const TextStyle().copyWith(fontStyle: FontStyle.normal),

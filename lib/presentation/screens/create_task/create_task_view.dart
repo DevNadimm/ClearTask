@@ -142,6 +142,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                             color: AppColors.primaryFontColor,
                           ),
                         ),
+                        tileColor: AppColors.cardColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                           side: const BorderSide(width: 1.4, color: AppColors.inputBorderColor),

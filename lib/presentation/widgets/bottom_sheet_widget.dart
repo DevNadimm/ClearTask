@@ -46,18 +46,23 @@ class BottomSheetWidget extends StatelessWidget {
                 final taskType = types[index];
                 final bool isSelected = type == taskType;
                 return Card(
-                  color: AppColors.cardColor,
+                  color: isSelected
+                      ? AppColors.primaryColor.withOpacity(0.2)
+                      : AppColors.cardColor,
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
+                    side: isSelected
+                        ? const BorderSide(width: 1, color: AppColors.primaryColor)
+                        : BorderSide.none,
                   ),
                   child: ListTile(
                     title: Text("${getTaskTypeEmoji(taskType)} $taskType"),
                     trailing: isSelected
                         ? const Icon(
-                      HugeIcons.strokeRoundedCheckmarkCircle03,
-                      color: AppColors.primaryColor,
-                    )
+                            HugeIcons.strokeRoundedCheckmarkSquare02,
+                            color: AppColors.primaryColor,
+                          )
                         : const SizedBox(),
                     onTap: () {
                       selectType(taskType);
