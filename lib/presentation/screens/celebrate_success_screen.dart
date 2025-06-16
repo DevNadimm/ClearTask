@@ -8,8 +8,27 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:lottie/lottie.dart';
 import 'package:get/get.dart';
 
-class CelebrateSuccessScreen extends StatelessWidget {
+class CelebrateSuccessScreen extends StatefulWidget {
   const CelebrateSuccessScreen({super.key});
+
+  @override
+  State<CelebrateSuccessScreen> createState() => _CelebrateSuccessScreenState();
+}
+
+class _CelebrateSuccessScreenState extends State<CelebrateSuccessScreen> with TickerProviderStateMixin {
+  late final AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,11 +38,17 @@ class CelebrateSuccessScreen extends StatelessWidget {
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
                 height: 250,
-                child: Lottie.asset('assets/animations/celebration.json'),
+                child: Lottie.asset(
+                  'assets/animations/celebration.json',
+                  controller: _animationController,
+                  onLoaded: (composition) {
+                    _animationController.duration = composition.duration;
+                    _animationController.forward();
+                  },
+                ),
               ),
               const SizedBox(height: 32),
               const Text(
@@ -52,15 +77,13 @@ class CelebrateSuccessScreen extends StatelessWidget {
                     context.read<TaskBloc>().add(DeleteAllTasks());
                     Get.offAll(() => const HomeScreen());
                   },
-                  icon: const Icon(
-                    HugeIcons.strokeRoundedDelete02,
-                    size: 20,
-                  ),
+                  icon: const Icon(HugeIcons.strokeRoundedDelete02, size: 20),
                   iconAlignment: IconAlignment.end,
                   label: const Text('Delete All Tasks'),
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white),
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
