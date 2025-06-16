@@ -120,10 +120,19 @@ class TaskCardWidget extends StatelessWidget {
       ),
       builder: (_) {
         return Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Container(
+                height: 4,
+                width: 50,
+                decoration: BoxDecoration(
+                  color: AppColors.secondaryFontColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              const SizedBox(height: 8),
               ListTile(
                 contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 12),
                 tileColor: AppColors.cardColor,
