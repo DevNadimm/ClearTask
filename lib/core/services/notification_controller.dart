@@ -19,10 +19,13 @@ class NotificationController {
         return;
       }
 
+      // final title = GetNotificationDetails.getNotificationTitle(task);
+      // final body = GetNotificationDetails.getNotificationBody(task);
+
       await NotificationService().scheduleNotification(
         id: notificationId,
-        title: task.title,
-        body: 'Don’t forget: ${task.title}',
+        title: "📝 Reminder",
+        body: "It's time to work on \"${task.title}.\"",
         scheduledDateTime: scheduleDateTime,
       );
 
