@@ -1,4 +1,5 @@
 import 'package:clear_task/core/constants/error_messages.dart';
+import 'package:clear_task/core/services/notification_controller.dart';
 import 'package:clear_task/data/models/task_model.dart';
 import 'package:clear_task/data/repositories/task_local_repository.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
@@ -30,8 +31,11 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         emit(TaskLoading());
         Task newTask = await taskLocalRepository.createTask(event.task);
         _cachedTasks.add(newTask);
+
         emit(TaskCreated());
         emit(TasksLoaded(List.from(_cachedTasks)));
+
+        await NotificationController.scheduleTaskNotifications(event.task);
       } catch (e) {
         emit(TaskError(ErrorMessages.createFailed));
       }
