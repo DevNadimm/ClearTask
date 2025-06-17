@@ -66,8 +66,11 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         // emit(TaskLoading());
         await taskLocalRepository.deleteTask(event.id);
         _cachedTasks.removeWhere((task) => task.id == event.id);
+        
         emit(TaskDeleted());
         emit(TasksLoaded(List.from(_cachedTasks)));
+
+        await NotificationController.cancelScheduledTaskNotification(id: event.id);
       } catch (e) {
         emit(TaskError(ErrorMessages.deleteFailed));
       }

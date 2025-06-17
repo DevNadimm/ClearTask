@@ -32,7 +32,7 @@ class NotificationController {
     }
   }
 
-  Future<void> cancelScheduledTaskNotification({required int id}) async {
+  static Future<void> cancelScheduledTaskNotification({required int id}) async {
     try {
       await NotificationService().cancelNotification(id);
       debugPrint('🗑️ [NOTIFY CANCELLED] Notification with ID $id successfully cancelled.');
