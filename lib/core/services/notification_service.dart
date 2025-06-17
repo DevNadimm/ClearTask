@@ -102,6 +102,5 @@ class NotificationService {
   /// Cancel a specific notification
   Future<void> cancelNotification(int id) async {
     await _flutterLocalNotificationsPlugin.cancel(id);
-    debugPrint('Notification with ID $id cancelled');
   }
 }

@@ -15,7 +15,7 @@ class NotificationController {
       final int notificationId = task.id ?? DateTime.now().millisecondsSinceEpoch;
 
       if (scheduleDateTime.isBefore(DateTime.now())) {
-        debugPrint("");
+        debugPrint('⏰ [SKIP] Task "${task.title}" notification time $scheduleDateTime is in the past. Skipping scheduling.');
         return;
       }
 
