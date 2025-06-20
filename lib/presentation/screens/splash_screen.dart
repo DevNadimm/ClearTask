@@ -1,6 +1,6 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/data/datasources/preferences_helper.dart';
-import 'package:clear_task/presentation/screens/home_screen.dart';
+import 'package:clear_task/presentation/screens/sign_in_screen.dart';
 import 'package:clear_task/presentation/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -44,7 +44,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       await prefHelper.setUserVisited();
       Get.offAll(() => const WelcomeScreen());
     } else {
-      Get.offAll(() => const HomeScreen());
+      // Get.offAll(() => const HomeScreen());
+      Get.offAll(() => const SignInScreen());
     }
   }
 
@@ -65,31 +66,14 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    height: 110,
-                    width: 110,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.1),
-                      border: Border.all(color: Colors.white30, width: 2),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Image.asset(
-                        'assets/icons/clear_task_icon_png.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  const Text(
+                  Image.asset("assets/icons/clear_task_icon_png.png",  height: 100),
+                  const SizedBox(height: 10),
+                  Text(
                     "Clear Task",
-                    style: TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryFontColor,
-                      letterSpacing: 1,
-                    ),
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineLarge!
+                        .copyWith(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
