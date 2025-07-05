@@ -1,5 +1,6 @@
 import 'package:clear_task/core/services/notification_service.dart';
 import 'package:clear_task/core/utils/formatter/date_formatter.dart';
+import 'package:clear_task/core/utils/helper_functions/get_notification_details.dart';
 import 'package:clear_task/data/models/task_model.dart';
 import 'package:flutter/material.dart';
 
@@ -19,13 +20,12 @@ class NotificationController {
         return;
       }
 
-      // final title = GetNotificationDetails.getNotificationTitle(task);
-      // final body = GetNotificationDetails.getNotificationBody(task);
+      final body = GetNotificationDetails.getNotificationMessage(task.title);
 
       await NotificationService().scheduleNotification(
         id: notificationId,
-        title: "📝 Reminder",
-        body: "It's time to work on \"${task.title}.\"",
+        title: "Task Reminder",
+        body: body,
         scheduledDateTime: scheduleDateTime,
       );
 
