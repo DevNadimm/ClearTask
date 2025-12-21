@@ -1,7 +1,8 @@
+import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hugeicons/hugeicons.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -9,51 +10,54 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const String appName = "Clear Task";
-    const String appDescription = "Clear Task helps you organize your day with simplicity. Quickly add tasks, mark them complete, and stay focused on what matters. Celebrate your progress or archive old tasks to keep your list fresh—designed to help you achieve more with less effort.";
+    const String appDescription = "Plan better. Focus more.\nClear Task keeps your daily tasks simple, organized, and stress-free.";
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(32),
         child: Column(
           children: [
             Expanded(
               flex: 5,
-              child: Image.asset(
-                "assets/illustration/todo_illustration.png",
-                scale: 6,
-              ),
+              child: Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.white,
+                ),
+                child: Image.asset(
+                  "assets/illustration/todo_illustration.png",
+                  scale: 8,
+                ),
+              )
             ),
             Expanded(
               flex: 2,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  const Text(
+                  Text(
                     appName,
-                    style: TextStyle(
-                      fontSize: 30,
+                    style: GoogleFonts.poppins(
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
+                      color: AppColors.primaryFontColor,
                     ),
                   ),
-                  const Text(
+                  Text(
                     appDescription,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: AppColors.secondaryFontColor,
+                      height: 1.2,
                     ),
                   ),
                   SizedBox(
-                    height: 50,
                     width: double.infinity,
-                    child: ElevatedButton.icon(
+                    height: 50,
+                    child: ElevatedButton(
                       onPressed: () => Get.offAll(() => const HomeScreen()),
-                      label: const Text("Get Started"),
-                      icon: const Icon(
-                        HugeIcons.strokeRoundedArrowRight02,
-                        size: 20,
-                      ),
-                      iconAlignment: IconAlignment.end,
+                      child: const Text("Get Started"),
                     ),
                   ),
                 ],

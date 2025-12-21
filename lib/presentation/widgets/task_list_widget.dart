@@ -3,6 +3,7 @@ import 'package:clear_task/core/utils/helper_functions/get_empty_message.dart';
 import 'package:clear_task/data/models/task_model.dart';
 import 'package:clear_task/presentation/widgets/task_card_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TaskListWidget extends StatelessWidget {
   final String tab;
@@ -45,7 +46,7 @@ class TaskListWidget extends StatelessWidget {
               Text(
                 _buildEmptyStateMessage(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: AppColors.primaryFontColor,
                   fontWeight: FontWeight.w600,
