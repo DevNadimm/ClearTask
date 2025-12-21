@@ -1,9 +1,10 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/data/datasources/preferences_helper.dart';
-import 'package:clear_task/presentation/screens/sign_in_screen.dart';
+import 'package:clear_task/presentation/screens/home_screen.dart';
 import 'package:clear_task/presentation/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -44,8 +45,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       await prefHelper.setUserVisited();
       Get.offAll(() => const WelcomeScreen());
     } else {
-      // Get.offAll(() => const HomeScreen());
-      Get.offAll(() => const SignInScreen());
+      Get.offAll(() => const HomeScreen());
     }
   }
 
@@ -66,28 +66,28 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset("assets/icons/clear_task_icon_png.png",  height: 100),
+                  Image.asset("assets/icons/clear_task_icon_png.png", height: 100),
                   const SizedBox(height: 10),
                   Text(
                     "Clear Task",
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineLarge!
-                        .copyWith(fontWeight: FontWeight.bold),
+                    style: GoogleFonts.poppins(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryFontColor,
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-
-          const Positioned(
-            bottom: 30,
+          Positioned(
+            bottom: 50,
             left: 0,
             right: 0,
             child: Center(
               child: Text(
                 "Simplify your day",
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   color: AppColors.secondaryFontColor,
                 ),
