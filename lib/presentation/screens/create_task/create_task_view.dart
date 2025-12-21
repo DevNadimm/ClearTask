@@ -10,6 +10,7 @@ import 'package:clear_task/presentation/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class CreateTaskView extends StatefulWidget {
@@ -134,9 +135,9 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                           : const SizedBox.shrink(),
                       const SizedBox(height: 24),
                       SwitchListTile(
-                        title: const Text(
+                        title: Text(
                           "Send Notification",
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w500,
                             color: AppColors.primaryFontColor,

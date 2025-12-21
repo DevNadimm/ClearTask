@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class SearchTaskScreen extends StatefulWidget {
@@ -84,7 +85,7 @@ class _SearchTaskScreenState extends State<SearchTaskScreen> {
                     Text(
                       state.errorMessage,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -105,19 +106,26 @@ class _SearchTaskScreenState extends State<SearchTaskScreen> {
     return TextField(
       controller: _searchController,
       focusNode: _searchFocusNode,
-      style: const TextStyle(color: Colors.white),
+      style: GoogleFonts.poppins(color: AppColors.primaryFontColor),
       onChanged: (value) {
         context.read<TaskBloc>().add(SearchTasks(value));
+        setState(() {});
       },
       decoration: InputDecoration(
         hintText: 'Search tasks...',
-        hintStyle: const TextStyle(color: Colors.white54),
+        hintStyle: GoogleFonts.poppins(color: AppColors.secondaryFontColor),
         filled: true,
         fillColor: AppColors.cardColor,
-        prefixIcon: const Icon(HugeIcons.strokeRoundedSearch02, color: Colors.white70),
+        prefixIcon: const Icon(
+          HugeIcons.strokeRoundedSearch01,
+          color: AppColors.secondaryFontColor,
+        ),
         suffixIcon: _searchController.text.isNotEmpty
             ? IconButton(
-                icon: const Icon(HugeIcons.strokeRoundedCancel01, color: Colors.white70),
+                icon: const Icon(
+                  HugeIcons.strokeRoundedCancel01,
+                  color: AppColors.secondaryFontColor,
+                ),
                 onPressed: () {
                   _searchController.clear();
                   FocusScope.of(context).unfocus();
@@ -133,7 +141,7 @@ class _SearchTaskScreenState extends State<SearchTaskScreen> {
     );
   }
 
-  OutlineInputBorder _buildOutlineInputBorder () {
+  OutlineInputBorder _buildOutlineInputBorder() {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(16),
       borderSide: BorderSide.none,

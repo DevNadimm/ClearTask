@@ -1,5 +1,6 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomTextField extends StatelessWidget {
   const CustomTextField({
@@ -46,10 +47,11 @@ class CustomTextField extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle().copyWith(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.primaryFontColor),
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryFontColor,
+              ),
             ),
             if (isRequired)
               const Text(
@@ -62,14 +64,16 @@ class CustomTextField extends StatelessWidget {
               ),
           ],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
+          style: GoogleFonts.poppins(color: AppColors.primaryFontColor),
           readOnly: readOnly,
           onTap: onTap,
           decoration: InputDecoration(
             hintText: effectiveHint,
+            hintStyle: GoogleFonts.poppins(color: AppColors.secondaryFontColor),
             suffixText: suffixText,
             border: const OutlineInputBorder(),
             prefixIcon: prefixIcon,
