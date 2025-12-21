@@ -105,8 +105,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                     lastDate: DateTime(2030),
                   );
                   if (selectedDate != null) {
-                    dueDate.text = DateFormatter.toLongMonthDayYear(
-                        selectedDate.toString());
+                    dueDate.text = DateFormatter.toLongMonthDayYear(selectedDate.toString());
                   }
                 },
               ),
