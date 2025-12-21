@@ -11,6 +11,7 @@ import 'package:clear_task/presentation/widgets/task_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -48,34 +49,43 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {},
-          icon: const Icon(HugeIcons.strokeRoundedMenu02),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () => Get.to(() => const SearchTaskScreen()),
-            icon: const Icon(HugeIcons.strokeRoundedSearch02),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              backgroundImage: NetworkImage(
-                "https://images.unsplash.com/photo-1613323593608-abc90fec84ff?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/icons/clear_task_icon_png.png',
+              scale: 44,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Clear Task',
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          )
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              onPressed: () => Get.to(() => const SearchTaskScreen()),
+              icon: const Icon(HugeIcons.strokeRoundedSearch01),
+            ),
+          ),
         ],
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
+          tabAlignment: TabAlignment.start, // Add this line
+          padding: EdgeInsets.zero, // Add this line
           splashBorderRadius: BorderRadius.circular(30),
           indicatorColor: AppColors.primaryColor,
           indicatorWeight: 3,
           labelColor: AppColors.primaryColor,
           unselectedLabelColor: AppColors.secondaryFontColor,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
+          labelStyle: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14),
+          unselectedLabelStyle: GoogleFonts.poppins(fontWeight: FontWeight.normal, fontSize: 14),
           tabs: _tabTitles.map((title) => Tab(text: title)).toList(),
         ),
       ),
