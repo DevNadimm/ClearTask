@@ -4,7 +4,7 @@ import 'package:clear_task/presentation/blocs/task/task_event.dart';
 import 'package:clear_task/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hugeicons/hugeicons.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:get/get.dart';
 
@@ -15,7 +15,8 @@ class CelebrateSuccessScreen extends StatefulWidget {
   State<CelebrateSuccessScreen> createState() => _CelebrateSuccessScreenState();
 }
 
-class _CelebrateSuccessScreenState extends State<CelebrateSuccessScreen> with TickerProviderStateMixin {
+class _CelebrateSuccessScreenState extends State<CelebrateSuccessScreen>
+    with TickerProviderStateMixin {
   late final AnimationController _animationController;
 
   @override
@@ -51,20 +52,20 @@ class _CelebrateSuccessScreenState extends State<CelebrateSuccessScreen> with Ti
                 ),
               ),
               const SizedBox(height: 32),
-              const Text(
+              Text(
                 'Congratulations!',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 34,
+                style: GoogleFonts.poppins(
+                  fontSize: 32,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryFontColor,
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'You’ve completed all your tasks successfully.\nKeep up the great work!',
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: AppColors.secondaryFontColor,
                 ),
@@ -72,26 +73,30 @@ class _CelebrateSuccessScreenState extends State<CelebrateSuccessScreen> with Ti
               const SizedBox(height: 40),
               SizedBox(
                 height: 50,
-                child: ElevatedButton.icon(
+                child: ElevatedButton(
                   onPressed: () {
                     context.read<TaskBloc>().add(DeleteAllTasks());
                     Get.offAll(() => const HomeScreen());
                   },
-                  icon: const Icon(HugeIcons.strokeRoundedDelete02, size: 20),
-                  iconAlignment: IconAlignment.end,
-                  label: const Text('Delete All Tasks'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: Colors.redAccent,
                     foregroundColor: Colors.white,
+                  ),
+                  child: Text(
+                    'Delete All Tasks',
+                    style: GoogleFonts.poppins(),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () => Get.back(),
-                child: const Text(
+                child: Text(
                   'Skip',
-                  style: TextStyle(color: AppColors.secondaryFontColor),
+                  style: GoogleFonts.poppins(
+                    color: AppColors.secondaryFontColor,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
