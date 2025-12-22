@@ -98,11 +98,16 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                 validationLabel: "Due date",
                 readOnly: true,
                 onTap: () async {
+                  DateTime initialDate = DateTime.now();
+                  if (dueDate.text.isNotEmpty) {
+                    initialDate = DateTime.parse(DateFormatter.toRawDateTime(dueDate.text));
+                  }
+
                   DateTime? selectedDate = await showDatePicker(
                     context: context,
-                    initialDate: DateTime.now(),
+                    initialDate: initialDate,
                     firstDate: DateTime.now(),
-                    lastDate: DateTime(2030),
+                    lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
                   );
                   if (selectedDate != null) {
                     dueDate.text = DateFormatter.toLongMonthDayYear(selectedDate.toString());
@@ -174,20 +179,34 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   }
 
   Future<String?> pickDateTime(BuildContext context) async {
-    DateTime? lastDate = dueDate.text.isNotEmpty ? DateFormatter.parseDateTime(DateFormatter.toRawDateTime(dueDate.text)) : null;
+    DateTime initialDate = DateTime.now();
+    TimeOfDay initialTime = TimeOfDay.now();
+
+    if (notificationDateAndTime.text.isNotEmpty) {
+      final parsedDateTime = DateTime.parse(
+        DateFormatter.toRawDateTime(notificationDateAndTime.text),
+      );
+      initialDate = parsedDateTime;
+      initialTime = TimeOfDay(hour: parsedDateTime.hour, minute: parsedDateTime.minute);
+    }
+
+    DateTime lastDate = DateTime.now().add(const Duration(days: 30));
+    if (dueDate.text.isNotEmpty) {
+      lastDate = DateTime.parse(DateFormatter.toRawDateTime(dueDate.text));
+    }
 
     final DateTime? selectedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: initialDate,
       firstDate: DateTime.now(),
-      lastDate: lastDate ?? DateTime.now().add(const Duration(days: 30)),
+      lastDate: lastDate,
     );
 
     if (selectedDate == null) return null;
 
     final TimeOfDay? selectedTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: initialTime,
     );
 
     if (selectedTime == null) return null;
@@ -200,6 +219,6 @@ class _CreateTaskViewState extends State<CreateTaskView> {
       selectedTime.minute,
     );
 
-    return DateFormatter.toLongMonthDayYearTime(fullDateTime.toString());
+    return DateFormatter.toLongMonthDayYearTime(fullDateTime.toIso8601String());
   }
 }

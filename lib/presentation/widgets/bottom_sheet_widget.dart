@@ -54,7 +54,7 @@ class BottomSheetWidget extends StatelessWidget {
             Expanded(
               child: ListView.builder(
                 itemCount: types.length,
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.only(top: 8, bottom: 24),
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   final taskType = types[index];

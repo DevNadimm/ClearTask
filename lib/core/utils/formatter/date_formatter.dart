@@ -11,10 +11,18 @@ class DateFormatter {
     return _dateFormatter.format(date);
   }
 
-  /// Converts a formatted date string like "June 10, 2025"
-  /// back to a raw ISO string like "2025-06-10T00:00:00.000"
+  /// Converts a formatted date or datetime string to an ISO 8601 string.
+  ///
+  /// Supports both:
+  /// - Date only: "June 10, 2025"           -> "2025-06-10T00:00:00.000"
+  /// - Date with time: "June 10, 2025 - 4:30 PM" -> "2025-06-10T16:30:00.000"
   static String toRawDateTime(String formattedDateStr) {
-    final parsedDate = _dateFormatter.parse(formattedDateStr);
+    DateTime parsedDate;
+    if (formattedDateStr.contains('-')) {
+      parsedDate = _dateTimeFormatter.parse(formattedDateStr);
+    } else {
+      parsedDate = _dateFormatter.parse(formattedDateStr);
+    }
     return parsedDate.toIso8601String();
   }
 

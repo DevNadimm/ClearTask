@@ -64,8 +64,7 @@ class TaskCardWidget extends StatelessWidget {
                       child: task.isCompleted
                           ? Padding(
                               padding: const EdgeInsets.all(1),
-                              child: Image.asset(
-                                  'assets/icons/clear_task_icon_png.png'),
+                              child: Image.asset('assets/icons/clear_task_icon_png.png'),
                             )
                           : null,
                     ),
@@ -94,32 +93,31 @@ class TaskCardWidget extends StatelessWidget {
                         const SizedBox(height: 6),
                         Row(
                           children: [
-                            Icon(HugeIcons.strokeRoundedCalendar04,
-                                size: 14,
-                                color: AppColors.secondaryFontColor
-                                    .withValues(alpha: 0.8)),
+                            Icon(
+                              HugeIcons.strokeRoundedCalendar04,
+                              size: 14,
+                              color: AppColors.secondaryFontColor.withValues(alpha: 0.8),
+                            ),
                             const SizedBox(width: 4),
                             Text(
-                                task.dueDate != null
-                                    ? DateFormatter.toLongMonthDayYear(
-                                        task.dueDate.toString())
-                                    : "Anytime",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  color: AppColors.secondaryFontColor,
-                                )),
+                              task.dueDate != null
+                                  ? DateFormatter.toLongMonthDayYear(task.dueDate.toString())
+                                  : "Anytime",
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                color: AppColors.secondaryFontColor,
+                              ),
+                            ),
                             if (task.sendNotification) ...[
                               const SizedBox(width: 8),
-                              const Icon(HugeIcons.strokeRoundedNotification03,
-                                  size: 16, color: Colors.orangeAccent),
+                              const Icon(HugeIcons.strokeRoundedNotification03, size: 16, color: Colors.orangeAccent),
                             ],
                             const Spacer(),
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: taskTypeColor.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 "${getTaskTypeEmoji(task.taskType)} ${task.taskType[0].toUpperCase()}${task.taskType.substring(1)}",
@@ -150,14 +148,7 @@ class TaskCardWidget extends StatelessWidget {
                         ),
                       ),
                     ),
-                  )
-                  // IconButton(
-                  //   onPressed: () => showBottomModal(context, taskTypeColor),
-                  //   icon: const Icon(
-                  //     HugeIcons.strokeRoundedMoreVertical,
-                  //     color: AppColors.secondaryFontColor,
-                  //   ),
-                  // ),
+                  ),
                 ],
               ),
             ],
@@ -246,14 +237,12 @@ class TaskCardWidget extends StatelessWidget {
                     Icon(
                       HugeIcons.strokeRoundedCalendar04,
                       size: 18,
-                      color:
-                          AppColors.secondaryFontColor.withValues(alpha: 0.8),
+                      color: AppColors.secondaryFontColor.withValues(alpha: 0.8),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       task.dueDate != null
-                          ? DateFormatter.toLongMonthDayYear(
-                              task.dueDate.toString())
+                          ? DateFormatter.toLongMonthDayYear(task.dueDate.toString())
                           : "Anytime",
                       style: GoogleFonts.poppins(
                         fontSize: 14,
@@ -269,13 +258,11 @@ class TaskCardWidget extends StatelessWidget {
                       Icon(
                         HugeIcons.strokeRoundedNotification03,
                         size: 18,
-                        color:
-                            AppColors.secondaryFontColor.withValues(alpha: 0.8),
+                        color: AppColors.secondaryFontColor.withValues(alpha: 0.8),
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        DateFormatter.toLongMonthDayYearTime(
-                            task.notificationTime.toString()),
+                        DateFormatter.toLongMonthDayYearTime(task.notificationTime.toString()),
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           color: AppColors.secondaryFontColor,
