@@ -28,13 +28,6 @@ ClearTask is a stunning, clean, and powerful task management application built w
 * **Anytime** - Tasks with no specific due date
 * **Completed** - Your hall of fame
 
-### Navigation Drawer
-* Home Tasks
-* Office Tasks
-* Study Tasks
-* Settings & Theme Preferences
-* About & Credits
-
 ---
 
 ## 🧱 Technical Architecture & Stack
@@ -58,7 +51,6 @@ lib/
 │
 ├── core/             # Constants, App Theme, Enums, formatters, and global widgets
 ├── data/             # Models (Task, Subtask), SQLite Database Helpers, and Repositories
-├── domain/           # Use cases & business logic definitions (if scaling to Clean Arch)
 ├── presentation/     # Views, Screens, BLoCs, Cubits, and Reusable UI Components
 └── main.dart         # Initialization and App Entry
 ```
