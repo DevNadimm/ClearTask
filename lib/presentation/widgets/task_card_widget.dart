@@ -2,9 +2,11 @@ import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/core/utils/formatter/date_formatter.dart';
 import 'package:clear_task/core/utils/helper_functions/get_task_type_color.dart';
 import 'package:clear_task/core/utils/helper_functions/get_task_type_emoji.dart';
+import 'package:clear_task/core/utils/widgets/custom_divider.dart';
 import 'package:clear_task/data/models/task_model.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
+import 'package:clear_task/presentation/screens/create_task/create_task_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -24,9 +26,14 @@ class TaskCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskTypeColor = getTaskTypeColor(task.taskType);
+    final hasSubtasks = task.subtasks.isNotEmpty;
+    final completedCount = task.subtasks.where((s) => s.isCompleted).length;
 
     return GestureDetector(
-      onTap: () => onToggleChange(task),
+      onTap: () {
+        // Only toggle at the task level when there are no subtasks.
+        if (!hasSubtasks) onToggleChange(task);
+      },
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -41,12 +48,15 @@ class TaskCardWidget extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ── Main task row ─────────────────────────────────────────────
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Checkbox (non-interactive when task has subtasks)
                   GestureDetector(
-                    onTap: () => onToggleChange(task),
+                    onTap: hasSubtasks ? null : () => onToggleChange(task),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: 24,
@@ -55,9 +65,11 @@ class TaskCardWidget extends StatelessWidget {
                         color: Colors.transparent,
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
-                          color: task.isCompleted
+                          color: hasSubtasks
                               ? taskTypeColor.withValues(alpha: 0.3)
-                              : taskTypeColor.withValues(alpha: 0.6),
+                              : task.isCompleted
+                                  ? taskTypeColor.withValues(alpha: 0.3)
+                                  : taskTypeColor.withValues(alpha: 0.6),
                           width: task.isCompleted ? 1 : 1.5,
                         ),
                       ),
@@ -74,21 +86,46 @@ class TaskCardWidget extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          task.title,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            decoration: task.isCompleted
-                                ? TextDecoration.lineThrough
-                                : null,
-                            decorationColor: AppColors.secondaryFontColor,
-                            color: task.isCompleted
-                                ? AppColors.secondaryFontColor
-                                : AppColors.primaryFontColor,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                task.title,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+                                  decorationColor: AppColors.secondaryFontColor,
+                                  color: task.isCompleted
+                                      ? AppColors.secondaryFontColor
+                                      : AppColors.primaryFontColor,
+                                ),
+                              ),
+                            ),
+                            // Progress badge when task has subtasks
+                            if (hasSubtasks) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: task.isCompleted
+                                      ? taskTypeColor.withValues(alpha: 0.25)
+                                      : AppColors.inputBorderColor.withValues(alpha: 0.5),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  "$completedCount / ${task.subtasks.length}",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: task.isCompleted ? taskTypeColor : AppColors.secondaryFontColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                         const SizedBox(height: 6),
                         Row(
@@ -110,7 +147,8 @@ class TaskCardWidget extends StatelessWidget {
                             ),
                             if (task.sendNotification) ...[
                               const SizedBox(width: 8),
-                              const Icon(HugeIcons.strokeRoundedNotification03, size: 16, color: Colors.orangeAccent),
+                              const Icon(HugeIcons.strokeRoundedNotification03,
+                                  size: 16, color: Colors.orangeAccent),
                             ],
                             const Spacer(),
                             Container(
@@ -151,6 +189,17 @@ class TaskCardWidget extends StatelessWidget {
                   ),
                 ],
               ),
+
+              // ── Subtask list ──────────────────────────────────────────────
+              if (hasSubtasks) ...[
+                const SizedBox(height: 10),
+                const CustomDivider(),
+                const SizedBox(height: 8),
+                ...task.subtasks.map((subtask) => _SubtaskRow(
+                      subtask: subtask,
+                      accentColor: taskTypeColor,
+                    )),
+              ],
             ],
           ),
         ),
@@ -226,11 +275,7 @@ class TaskCardWidget extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 22),
-                Divider(
-                  color: AppColors.inputBorderColor.withValues(alpha: 0.6),
-                  height: 1,
-                  thickness: 1,
-                ),
+                const CustomDivider(),
                 const SizedBox(height: 22),
                 Row(
                   children: [
@@ -275,6 +320,17 @@ class TaskCardWidget extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     Get.back();
+                    Get.to(() => CreateTaskScreen(editTask: task));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                  ),
+                  child: Text("Edit Task", style: GoogleFonts.poppins()),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Get.back();
                     context.read<TaskBloc>().add(DeleteTask(task.id!));
                   },
                   style: ElevatedButton.styleFrom(
@@ -293,6 +349,75 @@ class TaskCardWidget extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+// ── Subtask row widget ─────────────────────────────────────────────────────────
+
+class _SubtaskRow extends StatelessWidget {
+  final Subtask subtask;
+  final Color accentColor;
+
+  const _SubtaskRow({required this.subtask, required this.accentColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        children: [
+          // Subtask checkbox
+          GestureDetector(
+            onTap: () => context.read<TaskBloc>().add(
+              ToggleSubtaskCompletion(subtask: subtask),
+            ),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: subtask.isCompleted
+                      ? accentColor.withValues(alpha: 0.4)
+                      : accentColor.withValues(alpha: 0.5),
+                  width: 1,
+                ),
+              ),
+              child: subtask.isCompleted
+                  ? Padding(
+                padding: const EdgeInsets.all(1),
+                child: Image.asset('assets/icons/clear_task_icon_png.png'),
+              )
+                  : null,
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Subtask title
+          Expanded(
+            child: GestureDetector(
+              onTap: () => context.read<TaskBloc>().add(
+                ToggleSubtaskCompletion(subtask: subtask),
+              ),
+              child: Text(
+                subtask.title,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: subtask.isCompleted
+                      ? AppColors.secondaryFontColor
+                      : AppColors.primaryFontColor,
+                  decoration: subtask.isCompleted ? TextDecoration.lineThrough : null,
+                  decorationColor: AppColors.secondaryFontColor,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

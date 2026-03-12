@@ -88,5 +88,5 @@ Here is a glimpse of the beautiful app in action!
 * 🧠 Passionate Flutter Developer
 * 🎓 BSc in CSE, Port City International University
 * 🔗 [LinkedIn](https://www.linkedin.com/in/devnadimm/)
-* 📬 [nadimchowdhury87@gmail.com](mailto:nadimchowdhury87@gmail.com)
+* 📬 [nadimm.dev@gmail.com](mailto:nadimchowdhury87@gmail.com)
 * 💻 [GitHub](https://github.com/DevNadimm)

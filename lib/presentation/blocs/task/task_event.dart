@@ -37,3 +37,24 @@ class SearchTasks extends TaskEvent {
 
   SearchTasks(this.query);
 }
+
+// ── Subtask events ────────────────────────────────────────────────────────────
+
+class AddSubtask extends TaskEvent {
+  final int taskId;
+  final Subtask subtask;
+
+  AddSubtask({required this.taskId, required this.subtask});
+}
+
+class ToggleSubtaskCompletion extends TaskEvent {
+  final Subtask subtask;
+
+  ToggleSubtaskCompletion({required this.subtask});
+}
+
+class DeleteSubtask extends TaskEvent {
+  final Subtask subtask;
+
+  DeleteSubtask({required this.subtask});
+}

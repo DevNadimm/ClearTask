@@ -1,29 +1,53 @@
 import 'package:flutter/material.dart';
 
 Color getTaskTypeColor(String taskType) {
-  final type = taskType.toLowerCase();
+  switch (taskType.toLowerCase()) {
+    case 'development':
+      return const Color(0xFF90CAF9);
 
-  if (type == 'office') {
-    return const Color(0xFF90CAF9);
-  } else if (type == 'home') {
-    return const Color(0xFFA5D6A7);
-  } else if (type == 'study') {
-    return const Color(0xFFB39DDB);
-  } else if (type == 'personal') {
-    return const Color(0xFF80CBC4);
-  } else if (type == 'shopping') {
-    return const Color(0xFFFFCC80);
-  } else if (type == 'fitness') {
-    return const Color(0xFFEF9A9A);
-  } else if (type == 'health') {
-    return const Color(0xFFF48FB1);
-  } else if (type == 'finance') {
-    return const Color(0xFF9FA8DA);
-  } else if (type == 'travel') {
-    return const Color(0xFF80DEEA);
-  } else if (type == 'event') {
-    return const Color(0xFFFFF59D);
-  } else {
-    return const Color(0xFFE0E0E0);
+    case 'work':
+      return const Color(0xFFA5D6A7);
+
+    case 'learning':
+      return const Color(0xFFB39DDB);
+
+    case 'projects':
+      return const Color(0xFF80CBC4);
+
+    case 'research':
+      return const Color(0xFFFFCC80);
+
+    case 'career':
+      return const Color(0xFFEF9A9A);
+
+    case 'personal':
+      return const Color(0xFFF48FB1);
+
+    case 'health':
+      return const Color(0xFF9FA8DA);
+
+    case 'fitness':
+      return const Color(0xFF80DEEA);
+
+    case 'finance':
+      return const Color(0xFFFFF59D);
+
+    case 'home':
+      return const Color(0xFFCE93D8);
+
+    case 'shopping':
+      return const Color(0xFFAED581);
+
+    case 'travel':
+      return const Color(0xFFFFAB91);
+
+    case 'events':
+      return const Color(0xFF81D4FA);
+
+    case 'others':
+      return const Color(0xFFBDBDBD);
+
+    default:
+      return const Color(0xFFE0E0E0);
   }
 }

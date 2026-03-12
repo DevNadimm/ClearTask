@@ -48,10 +48,21 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         final index = _cachedTasks.indexWhere((task) => task.id == event.task.id);
 
         if (index != -1) {
+          final oldTask = _cachedTasks[index];
           final updatedTask = await taskLocalRepository.updateTask(event.task);
           _cachedTasks[index] = updatedTask;
           emit(TaskUpdated());
           emit(TasksLoaded(List.from(_cachedTasks)));
+
+          // Cancel the old notification if it existed
+          if (oldTask.sendNotification) {
+            await NotificationController.cancelScheduledTaskNotification(id: event.task.id!);
+          }
+          
+          // Schedule the new notification (controller handles validation)
+          if (updatedTask.sendNotification) {
+            await NotificationController.scheduleTaskNotifications(updatedTask);
+          }
         } else {
           emit(TaskError(ErrorMessages.taskNotFound));
         }
@@ -63,10 +74,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     // Delete task
     on<DeleteTask>((event, emit) async {
       try {
-        // emit(TaskLoading());
         await taskLocalRepository.deleteTask(event.id);
         _cachedTasks.removeWhere((task) => task.id == event.id);
-        
+
         emit(TaskDeleted());
         emit(TasksLoaded(List.from(_cachedTasks)));
 
@@ -78,10 +88,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
 
     // Delete all Tasks
     on<DeleteAllTasks>((event, emit) async {
-      // emit(TaskLoading());
       try {
         await taskLocalRepository.deleteAllTasks();
-        _cachedTasks.clear(); // Clear cache
+        _cachedTasks.clear();
         emit(AllTasksDeleted());
         emit(TasksLoaded([]));
       } catch (e) {
@@ -89,10 +98,13 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       }
     });
 
-    // Toggle task completion
+    // Toggle task completion (only for tasks without subtasks)
     on<ToggleTaskCompletion>((event, emit) async {
       if (state is TasksLoaded) {
         try {
+          // If the task has subtasks, toggling is driven by subtask completion.
+          if (event.task.subtasks.isNotEmpty) return;
+
           Task updatedTask = event.task;
           updatedTask.isCompleted = !updatedTask.isCompleted;
           await taskLocalRepository.updateTask(updatedTask);
@@ -126,6 +138,60 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         emit(TasksLoaded(filtered));
       } catch (e) {
         emit(TaskError(ErrorMessages.fetchFailed));
+      }
+    });
+
+    // ── Subtask events ──────────────────────────────────────────────────────────
+
+    // Add a subtask to an existing task
+    on<AddSubtask>((event, emit) async {
+      try {
+        final saved = await taskLocalRepository.createSubtask(event.subtask);
+        final index = _cachedTasks.indexWhere((t) => t.id == event.taskId);
+        if (index != -1) {
+          _cachedTasks[index].subtasks.add(saved);
+        }
+        emit(TasksLoaded(List.from(_cachedTasks)));
+      } catch (e) {
+        emit(TaskError(ErrorMessages.createFailed));
+      }
+    });
+
+    // Toggle a subtask's completion status
+    on<ToggleSubtaskCompletion>((event, emit) async {
+      try {
+        final updated = event.subtask.copyWith(isCompleted: !event.subtask.isCompleted);
+        await taskLocalRepository.updateSubtask(updated);
+
+        final taskIndex = _cachedTasks.indexWhere((t) => t.id == updated.taskId);
+        if (taskIndex != -1) {
+          final subtaskIndex = _cachedTasks[taskIndex].subtasks.indexWhere((s) => s.id == updated.id);
+          if (subtaskIndex != -1) {
+            _cachedTasks[taskIndex].subtasks[subtaskIndex] = updated;
+          }
+        }
+
+        emit(TasksLoaded(List.from(_cachedTasks)));
+
+        // Check if all tasks (and their subtasks) are now completed
+        bool isAllCompleted = _cachedTasks.length > 1 && _cachedTasks.every((task) => task.isCompleted);
+        if (isAllCompleted) add(CelebrateAllTasksCompleted());
+      } catch (e) {
+        emit(state);
+      }
+    });
+
+    // Delete a subtask
+    on<DeleteSubtask>((event, emit) async {
+      try {
+        await taskLocalRepository.deleteSubtask(event.subtask.id!);
+        final taskIndex = _cachedTasks.indexWhere((t) => t.id == event.subtask.taskId);
+        if (taskIndex != -1) {
+          _cachedTasks[taskIndex].subtasks.removeWhere((s) => s.id == event.subtask.id);
+        }
+        emit(TasksLoaded(List.from(_cachedTasks)));
+      } catch (e) {
+        emit(state);
       }
     });
   }
