@@ -1,4 +1,5 @@
 import 'package:clear_task/core/constants/colors.dart';
+import 'package:clear_task/core/utils/helper_functions/ad_helper.dart';
 import 'package:clear_task/core/utils/helper_functions/get_filtered_tasks.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,6 +23,29 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  BannerAd? _bannerAd;
+  bool _isAdLoaded = false;
+
+  void _loadBannerAd() {
+    _bannerAd = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+        },
+      ),
+    );
+
+    _bannerAd!.load();
+  }
+
   late final TabController _tabController;
   final List<String> _tabTitles = [
     "All",
@@ -34,13 +59,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _tabTitles.length, vsync: this, initialIndex: 1);
-    context.read<TaskBloc>().add(FetchTasks());
+    _tabController = TabController(
+      length: _tabTitles.length,
+      vsync: this,
+      initialIndex: 1,
+    );
+
+    final currentState = context.read<TaskBloc>().state;
+    if (currentState is! TasksLoaded) {
+      context.read<TaskBloc>().add(FetchTasks());
+    }
+
+    _loadBannerAd();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -76,8 +112,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
-          tabAlignment: TabAlignment.start, // Add this line
-          padding: EdgeInsets.zero, // Add this line
+          tabAlignment: TabAlignment.start,
+          padding: EdgeInsets.zero,
           splashBorderRadius: BorderRadius.circular(30),
           indicatorColor: AppColors.primaryColor,
           indicatorWeight: 3,
@@ -91,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       floatingActionButton: FloatingActionButton(
         tooltip: 'Create Task',
         onPressed: () => Get.to(() => const CreateTaskScreen()),
-        child: const Icon(HugeIcons.strokeRoundedTaskAdd01, size: 30),
+        child: const Icon(HugeIcons.strokeRoundedAdd01, size: 30),
       ),
       body: BlocConsumer<TaskBloc, TaskState>(
         listener: (context, state) {
@@ -115,6 +151,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   onToggleChange: (task) {
                     context.read<TaskBloc>().add(ToggleTaskCompletion(task: task));
                   },
+                  bannerAd: _isAdLoaded ? _bannerAd : null,
                 );
               }).toList(),
             );

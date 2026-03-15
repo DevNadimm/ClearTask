@@ -53,15 +53,12 @@ class _CreateTaskViewState extends State<CreateTaskView> {
         dueDate.text = DateFormatter.toLongMonthDayYear(t.dueDate!);
       }
       if (t.notificationTime != null) {
-        notificationDateAndTime.text =
-            DateFormatter.toLongMonthDayYearTime(t.notificationTime!);
+        notificationDateAndTime.text = DateFormatter.toLongMonthDayYearTime(t.notificationTime!);
       }
 
       // Seed the notification cubit once the widget tree is ready.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context
-            .read<NotificationCubit>()
-            .toggleNotification(t.sendNotification);
+        context.read<NotificationCubit>().toggleNotification(t.sendNotification);
       });
     }
   }
@@ -78,8 +75,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     super.dispose();
   }
 
-  void _addSubtaskField() =>
-      setState(() => _newSubtaskControllers.add(TextEditingController()));
+  void _addSubtaskField() => setState(() => _newSubtaskControllers.add(TextEditingController()));
 
   void _removeNewSubtaskField(int index) {
     _newSubtaskControllers[index].dispose();
@@ -99,10 +95,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     final sendNotification = context.read<NotificationCubit>().state;
     final bloc = context.read<TaskBloc>();
 
-    final newSubtaskTitles = _newSubtaskControllers
-        .map((c) => c.text.trim())
-        .where((t) => t.isNotEmpty)
-        .toList();
+    final newSubtaskTitles = _newSubtaskControllers.map((c) => c.text.trim()).where((t) => t.isNotEmpty).toList();
 
     if (_isEditing) {
       // ── Edit mode ──────────────────────────────────────────────────────────
@@ -453,8 +446,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     TimeOfDay initialTime = TimeOfDay.now();
 
     if (notificationDateAndTime.text.isNotEmpty) {
-      final parsed = DateTime.parse(
-          DateFormatter.toRawDateTime(notificationDateAndTime.text));
+      final parsed = DateTime.parse(DateFormatter.toRawDateTime(notificationDateAndTime.text));
       initialDate = parsed;
       initialTime = TimeOfDay(hour: parsed.hour, minute: parsed.minute);
     }

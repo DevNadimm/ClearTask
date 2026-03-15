@@ -11,6 +11,11 @@ class Subtask {
     this.isCompleted = false,
   });
 
+  @override
+  String toString() {
+    return 'Subtask(id: $id, taskId: $taskId, title: $title, isCompleted: $isCompleted)';
+  }
+
   static Map<String, dynamic> toMap(Subtask subtask) {
     final map = {
       'taskId': subtask.taskId,
@@ -71,6 +76,21 @@ class Task {
   bool get isCompleted {
     if (subtasks.isEmpty) return _isCompleted;
     return subtasks.every((s) => s.isCompleted);
+  }
+
+  @override
+  String toString() {
+    return '''
+Task(
+  id: $id,
+  title: $title,
+  dueDate: $dueDate,
+  taskType: $taskType,
+  sendNotification: $sendNotification,
+  notificationTime: $notificationTime,
+  isCompleted: $isCompleted,
+  subtasks: [${subtasks.join(', ')}]
+)''';
   }
 
   /// The raw stored value (unaffected by subtask computation).
