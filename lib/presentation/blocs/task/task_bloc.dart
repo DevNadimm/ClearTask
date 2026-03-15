@@ -89,6 +89,12 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     // Delete all Tasks
     on<DeleteAllTasks>((event, emit) async {
       try {
+        // Cancel all notifications before clearing cache
+        for (final task in _cachedTasks) {
+          if (task.sendNotification && task.id != null) {
+            await NotificationController.cancelScheduledTaskNotification(id: task.id!);
+          }
+        }
         await taskLocalRepository.deleteAllTasks();
         _cachedTasks.clear();
         emit(AllTasksDeleted());

@@ -4,16 +4,22 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DBHelper {
+  static Database? _db;
+
   Future<Database> initDB() async {
+    if (_db != null) return _db!;
+
     String getDatabasePath = await getDatabasesPath();
     String path = join(getDatabasePath, "task.db");
 
-    return await openDatabase(
+    _db = await openDatabase(
       path,
       version: 2,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
+
+    return _db!;
   }
 
   _onCreate(Database db, int version) async {
@@ -95,7 +101,6 @@ class DBHelper {
 
   Future<int> deleteTask(int id) async {
     final Database db = await initDB();
-    // Delete subtasks first (cascade safety for older SQLite builds)
     await db.delete("tbl_subtask", where: "taskId = ?", whereArgs: [id]);
     int count = await db.delete("tbl_task", where: "id = ?", whereArgs: [id]);
     debugPrint('🗑️ Deleted task with id: $id, affected rows: $count');
