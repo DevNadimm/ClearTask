@@ -50,8 +50,16 @@ class Task {
   final String title;
   final String? dueDate;
   final String taskType;
+  final String priority;
   final bool sendNotification;
   final String? notificationTime;
+  final String? completedAt;
+
+  // Cloud sync fields
+  final String? cloudId;
+  final bool isSynced;
+  final bool isDeleted;
+  final String? calendarEventId;
 
   /// Internal stored value – used only when there are no subtasks.
   bool _isCompleted;
@@ -64,8 +72,14 @@ class Task {
     required this.title,
     this.dueDate,
     required this.taskType,
+    this.priority = 'none',
     this.sendNotification = false,
     this.notificationTime,
+    this.completedAt,
+    this.cloudId,
+    this.isSynced = false,
+    this.isDeleted = false,
+    this.calendarEventId,
     bool isCompleted = false,
     List<Subtask>? subtasks,
   })  : _isCompleted = isCompleted,
@@ -88,6 +102,7 @@ Task(
   taskType: $taskType,
   sendNotification: $sendNotification,
   notificationTime: $notificationTime,
+  completedAt: $completedAt,
   isCompleted: $isCompleted,
   subtasks: [${subtasks.join(', ')}]
 )''';
@@ -107,8 +122,14 @@ Task(
       'title': task.title,
       'dueDate': task.dueDate,
       'taskType': task.taskType,
+      'priority': task.priority,
       'sendNotification': task.sendNotification ? 1 : 0,
       'notificationTime': task.notificationTime,
+      'completedAt': task.completedAt,
+      'cloudId': task.cloudId,
+      'isSynced': task.isSynced ? 1 : 0,
+      'isDeleted': task.isDeleted ? 1 : 0,
+      'calendarEventId': task.calendarEventId,
       // Persist the stored value (not the computed getter) so plain tasks work.
       'isCompleted': task._isCompleted ? 1 : 0,
     };
@@ -122,9 +143,49 @@ Task(
       title: map['title'],
       dueDate: map['dueDate'],
       taskType: map['taskType'],
+      priority: map['priority'] ?? 'none',
       sendNotification: map['sendNotification'] == 1,
       notificationTime: map['notificationTime'],
+      completedAt: map['completedAt'],
+      cloudId: map['cloudId'],
+      isSynced: map['isSynced'] == 1,
+      isDeleted: map['isDeleted'] == 1,
+      calendarEventId: map['calendarEventId'],
       isCompleted: map['isCompleted'] == 1,
+    );
+  }
+
+  Task copyWith({
+    int? id,
+    String? title,
+    String? dueDate,
+    String? taskType,
+    String? priority,
+    bool? sendNotification,
+    String? notificationTime,
+    String? completedAt,
+    String? cloudId,
+    bool? isSynced,
+    bool? isDeleted,
+    String? calendarEventId,
+    bool? isCompleted,
+    List<Subtask>? subtasks,
+  }) {
+    return Task(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      dueDate: dueDate ?? this.dueDate,
+      taskType: taskType ?? this.taskType,
+      priority: priority ?? this.priority,
+      sendNotification: sendNotification ?? this.sendNotification,
+      notificationTime: notificationTime ?? this.notificationTime,
+      completedAt: completedAt ?? this.completedAt,
+      cloudId: cloudId ?? this.cloudId,
+      isSynced: isSynced ?? this.isSynced,
+      isDeleted: isDeleted ?? this.isDeleted,
+      calendarEventId: calendarEventId ?? this.calendarEventId,
+      isCompleted: isCompleted ?? _isCompleted,
+      subtasks: subtasks ?? this.subtasks,
     );
   }
 }

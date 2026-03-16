@@ -1,6 +1,7 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/core/constants/task_type.dart';
 import 'package:clear_task/core/utils/formatter/date_formatter.dart';
+import 'package:clear_task/core/utils/helper_functions/get_priority_color.dart';
 import 'package:clear_task/data/models/task_model.dart';
 import 'package:clear_task/data/repositories/task_local_repository.dart';
 import 'package:clear_task/presentation/blocs/notification/notification_cubit.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:clear_task/data/services/ai_service.dart';
 
 class CreateTaskView extends StatefulWidget {
   /// When [editTask] is provided the view runs in edit mode.
@@ -37,6 +39,14 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   /// Copy of existing subtasks shown when editing (mutated by delete).
   late List<Subtask> _existingSubtasks;
 
+  /// Subtasks marked for deletion (executed on save).
+  final List<Subtask> _subtasksToDelete = [];
+
+  bool _isGeneratingSubtasks = false;
+  String _selectedPriority = 'none';
+
+  static const List<String> _priorities = ['none', 'low', 'medium', 'high'];
+
   bool get _isEditing => widget.editTask != null;
 
   @override
@@ -48,6 +58,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
       final t = widget.editTask!;
       title.text = t.title;
       taskType.text = t.taskType;
+      _selectedPriority = t.priority;
 
       if (t.dueDate != null) {
         dueDate.text = DateFormatter.toLongMonthDayYear(t.dueDate!);
@@ -83,8 +94,53 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   }
 
   void _deleteExistingSubtask(Subtask subtask) {
-    context.read<TaskBloc>().add(DeleteSubtask(subtask: subtask));
+    _subtasksToDelete.add(subtask);
     setState(() => _existingSubtasks.removeWhere((s) => s.id == subtask.id));
+  }
+
+  Future<void> _generateSubtasks() async {
+    final messenger = ScaffoldMessenger.of(context);
+    
+    if (title.text.trim().isEmpty) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text("Please enter a task title first to generate subtasks.", style: GoogleFonts.poppins(color: Colors.white)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isGeneratingSubtasks = true);
+
+    try {
+      final generatedSubtasks = await AiService.generateSubtasks(title.text);
+      if (generatedSubtasks.isNotEmpty) {
+        setState(() {
+          for (final subtaskTitle in generatedSubtasks) {
+            final controller = TextEditingController(text: subtaskTitle);
+            _newSubtaskControllers.add(controller);
+          }
+        });
+      } else {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text("AI couldn't generate subtasks for this title.", style: GoogleFonts.poppins(color: Colors.white)),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text("Failed to generate subtasks: ${e.toString()}", style: GoogleFonts.poppins(color: Colors.white)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isGeneratingSubtasks = false);
+    }
   }
 
   // ── Submit ─────────────────────────────────────────────────────────────────
@@ -99,10 +155,10 @@ class _CreateTaskViewState extends State<CreateTaskView> {
 
     if (_isEditing) {
       // ── Edit mode ──────────────────────────────────────────────────────────
-      final updatedTask = Task(
-        id: widget.editTask!.id,
+      final updatedTask = widget.editTask!.copyWith(
         title: title.text,
         taskType: taskType.text,
+        priority: _selectedPriority,
         dueDate: dueDate.text.isNotEmpty
             ? DateFormatter.toRawDateTime(dueDate.text)
             : null,
@@ -110,7 +166,6 @@ class _CreateTaskViewState extends State<CreateTaskView> {
             ? DateFormatter.fromLongMonthDayYearTime(
                 notificationDateAndTime.text)
             : null,
-        isCompleted: widget.editTask!.isCompleted,
         sendNotification: sendNotification,
         subtasks: _existingSubtasks,
       );
@@ -125,13 +180,22 @@ class _CreateTaskViewState extends State<CreateTaskView> {
             subtask: Subtask(taskId: updatedTask.id!, title: t),
           ));
         }
-        bloc.add(FetchTasks());
       }
+
+      // Actually delete subtasks that were removed in the UI.
+      if (_subtasksToDelete.isNotEmpty) {
+        for (final s in _subtasksToDelete) {
+          bloc.add(DeleteSubtask(subtask: s));
+        }
+      }
+
+      bloc.add(FetchTasks());
     } else {
       // ── Create mode ────────────────────────────────────────────────────────
       final task = Task(
         title: title.text,
         taskType: taskType.text,
+        priority: _selectedPriority,
         dueDate: dueDate.text.isNotEmpty
             ? DateFormatter.toRawDateTime(dueDate.text)
             : null,
@@ -209,6 +273,66 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                 isRequired: true,
               ),
               const SizedBox(height: 24),
+
+              // ── Priority selector ─────────────────────────────────────────
+              Text(
+                "Priority",
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: context.primaryFontColor,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: context.inputBorderColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: context.inputBorderColor,
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: _priorities.map((p) {
+                    final bool isSelected = _selectedPriority == p;
+                    final Color chipColor = p == 'none'
+                        ? context.secondaryFontColor
+                        : getPriorityColor(p);
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _selectedPriority = p),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? chipColor.withValues(alpha: 0.2)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Center(
+                            child: Text(
+                              getPriorityLabel(p),
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                                color: isSelected
+                                    ? chipColor
+                                    : context.secondaryFontColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 24),
               CustomTextField(
                 controller: dueDate,
                 label: "Due Date",
@@ -262,15 +386,15 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                           style: GoogleFonts.poppins(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.primaryFontColor,
+                            color: context.primaryFontColor,
                           ),
                         ),
-                        tileColor: AppColors.cardColor,
+                        tileColor: context.cardColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
-                          side: const BorderSide(
+                          side: BorderSide(
                               width: 1.4,
-                              color: AppColors.inputBorderColor),
+                              color: context.inputBorderColor),
                         ),
                         value: sendNotification,
                         onChanged: (val) {
@@ -294,14 +418,35 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.primaryFontColor,
+                      color: context.primaryFontColor,
                     ),
                   ),
                   const Spacer(),
+                  if (_isGeneratingSubtasks)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      child: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+                        ),
+                      ),
+                    )
+                  else
+                    TextButton.icon(
+                      onPressed: _generateSubtasks,
+                      icon: const Icon(Icons.auto_awesome, size: 18),
+                      label: Text("AI",
+                          style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.bold)),
+                      style: TextButton.styleFrom(
+                          foregroundColor: Colors.amber.shade600),
+                    ),
                   TextButton.icon(
                     onPressed: _addSubtaskField,
                     icon: const Icon(HugeIcons.strokeRoundedAdd01, size: 18),
-                    label: Text("Add subtask",
+                    label: Text("Add",
                         style: GoogleFonts.poppins(fontSize: 13)),
                     style: TextButton.styleFrom(
                         foregroundColor: AppColors.primaryColor),
@@ -318,7 +463,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                       "No subtasks added yet.",
                       style: GoogleFonts.poppins(
                           fontSize: 13,
-                          color: AppColors.secondaryFontColor),
+                          color: context.secondaryFontColor),
                     ),
                   ),
                 ..._existingSubtasks.asMap().entries.map((entry) {
@@ -354,12 +499,12 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               color: subtask.isCompleted
-                                  ? AppColors.secondaryFontColor
-                                  : AppColors.primaryFontColor,
+                                  ? context.secondaryFontColor
+                                  : context.primaryFontColor,
                               decoration: subtask.isCompleted
                                   ? TextDecoration.lineThrough
                                   : null,
-                              decorationColor: AppColors.secondaryFontColor,
+                              decorationColor: context.secondaryFontColor,
                             ),
                           ),
                         ),
@@ -387,7 +532,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                     "No subtasks added yet.",
                     style: GoogleFonts.poppins(
                         fontSize: 13,
-                        color: AppColors.secondaryFontColor),
+                        color: context.secondaryFontColor),
                   ),
                 ),
 
@@ -403,10 +548,10 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                         Expanded(
                           child: TextFormField(
                             controller: _newSubtaskControllers[index],
-                            style: GoogleFonts.poppins(color: AppColors.primaryFontColor),
+                            style: GoogleFonts.poppins(color: context.primaryFontColor),
                             decoration: InputDecoration(
                               hintText: "New subtask ${index + 1}",
-                              hintStyle: GoogleFonts.poppins(color: AppColors.secondaryFontColor),
+                              hintStyle: GoogleFonts.poppins(color: context.secondaryFontColor),
                               border: const OutlineInputBorder(),
                             ),
                           ),
@@ -464,6 +609,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     );
     if (selectedDate == null) return null;
 
+    if (!context.mounted) return null;
     final TimeOfDay? selectedTime = await showTimePicker(
       context: context,
       initialTime: initialTime,

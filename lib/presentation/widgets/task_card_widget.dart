@@ -1,5 +1,6 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/core/utils/formatter/date_formatter.dart';
+import 'package:clear_task/core/utils/helper_functions/get_priority_color.dart';
 import 'package:clear_task/core/utils/helper_functions/get_task_type_color.dart';
 import 'package:clear_task/core/utils/helper_functions/get_task_type_emoji.dart';
 import 'package:clear_task/core/utils/widgets/custom_divider.dart';
@@ -26,6 +27,8 @@ class TaskCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskTypeColor = getTaskTypeColor(task.taskType);
+    final priorityColor = getPriorityColor(task.priority);
+    final hasPriority = task.priority != 'none';
     final hasSubtasks = task.subtasks.isNotEmpty;
     final completedCount = task.subtasks.where((s) => s.isCompleted).length;
 
@@ -37,14 +40,14 @@ class TaskCardWidget extends StatelessWidget {
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(
+          side: BorderSide(
             width: 1,
-            color: AppColors.inputBorderColor,
+            color: context.inputBorderColor,
           ),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         elevation: 2,
-        color: AppColors.cardColor,
+        color: context.cardColor,
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
@@ -89,19 +92,36 @@ class TaskCardWidget extends StatelessWidget {
                         Row(
                           children: [
                             Expanded(
-                              child: Text(
-                                task.title,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: task.isCompleted ? TextDecoration.lineThrough : null,
-                                  decorationColor: AppColors.secondaryFontColor,
-                                  color: task.isCompleted
-                                      ? AppColors.secondaryFontColor
-                                      : AppColors.primaryFontColor,
-                                ),
+                              child: Row(
+                                children: [
+                                  if (hasPriority) ...[
+                                    Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        color: priorityColor,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                  ],
+                                  Expanded(
+                                    child: Text(
+                                      task.title,
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+                                        decorationColor: context.secondaryFontColor,
+                                        color: task.isCompleted
+                                            ? context.secondaryFontColor
+                                            : context.primaryFontColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             // Progress badge when task has subtasks
@@ -112,7 +132,7 @@ class TaskCardWidget extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: task.isCompleted
                                       ? taskTypeColor.withValues(alpha: 0.25)
-                                      : AppColors.inputBorderColor.withValues(alpha: 0.5),
+                                      : context.inputBorderColor.withValues(alpha: 0.5),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
@@ -120,7 +140,7 @@ class TaskCardWidget extends StatelessWidget {
                                   style: GoogleFonts.poppins(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
-                                    color: task.isCompleted ? taskTypeColor : AppColors.secondaryFontColor,
+                                    color: task.isCompleted ? taskTypeColor : context.secondaryFontColor,
                                   ),
                                 ),
                               ),
@@ -133,7 +153,7 @@ class TaskCardWidget extends StatelessWidget {
                             Icon(
                               HugeIcons.strokeRoundedCalendar04,
                               size: 14,
-                              color: AppColors.secondaryFontColor.withValues(alpha: 0.8),
+                              color: context.secondaryFontColor.withValues(alpha: 0.8),
                             ),
                             const SizedBox(width: 4),
                             Text(
@@ -142,7 +162,7 @@ class TaskCardWidget extends StatelessWidget {
                                   : "Anytime",
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
-                                color: AppColors.secondaryFontColor,
+                                color: context.secondaryFontColor,
                               ),
                             ),
                             if (task.sendNotification) ...[
@@ -174,14 +194,14 @@ class TaskCardWidget extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: InkWell(
-                      onTap: () => showBottomModal(context, taskTypeColor),
+                      onTap: () => showBottomModal(context, hasPriority, priorityColor, taskTypeColor),
                       splashColor: AppColors.primaryColorTransparent,
                       borderRadius: BorderRadius.circular(100),
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        child: const Icon(
+                        child: Icon(
                           HugeIcons.strokeRoundedMoreVertical,
-                          color: AppColors.secondaryFontColor,
+                          color: context.secondaryFontColor,
                           size: 20,
                         ),
                       ),
@@ -207,7 +227,7 @@ class TaskCardWidget extends StatelessWidget {
     );
   }
 
-  void showBottomModal(BuildContext context, Color taskTypeColor) {
+  void showBottomModal(BuildContext context, bool hasPriority, Color priorityColor, Color taskTypeColor) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -215,7 +235,7 @@ class TaskCardWidget extends StatelessWidget {
       ),
       builder: (_) {
         return Material(
-          color: AppColors.cardColor,
+          color: context.cardColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           child: Padding(
             padding: const EdgeInsets.all(28),
@@ -226,7 +246,7 @@ class TaskCardWidget extends StatelessWidget {
                   height: 4,
                   width: 50,
                   decoration: BoxDecoration(
-                    color: AppColors.secondaryFontColor.withValues(alpha: 0.7),
+                    color: context.secondaryFontColor.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
@@ -256,7 +276,7 @@ class TaskCardWidget extends StatelessWidget {
                             style: GoogleFonts.poppins(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
-                              color: AppColors.primaryFontColor,
+                              color: context.primaryFontColor,
                               height: 1.2,
                             ),
                           ),
@@ -282,7 +302,7 @@ class TaskCardWidget extends StatelessWidget {
                     Icon(
                       HugeIcons.strokeRoundedCalendar04,
                       size: 18,
-                      color: AppColors.secondaryFontColor.withValues(alpha: 0.8),
+                      color: context.secondaryFontColor.withValues(alpha: 0.8),
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -291,7 +311,7 @@ class TaskCardWidget extends StatelessWidget {
                           : "Anytime",
                       style: GoogleFonts.poppins(
                         fontSize: 14,
-                        color: AppColors.secondaryFontColor,
+                        color: context.secondaryFontColor,
                       ),
                     ),
                   ],
@@ -303,14 +323,38 @@ class TaskCardWidget extends StatelessWidget {
                       Icon(
                         HugeIcons.strokeRoundedNotification03,
                         size: 18,
-                        color: AppColors.secondaryFontColor.withValues(alpha: 0.8),
+                        color: context.secondaryFontColor.withValues(alpha: 0.8),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         DateFormatter.toLongMonthDayYearTime(task.notificationTime.toString()),
                         style: GoogleFonts.poppins(
                           fontSize: 14,
-                          color: AppColors.secondaryFontColor,
+                          color: context.secondaryFontColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (hasPriority) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: priorityColor,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "${task.priority[0].toUpperCase()}${task.priority.substring(1)} Priority",
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: priorityColor,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -406,10 +450,10 @@ class _SubtaskRow extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: subtask.isCompleted
-                      ? AppColors.secondaryFontColor
-                      : AppColors.primaryFontColor,
+                      ? context.secondaryFontColor
+                      : context.primaryFontColor,
                   decoration: subtask.isCompleted ? TextDecoration.lineThrough : null,
-                  decorationColor: AppColors.secondaryFontColor,
+                  decorationColor: context.secondaryFontColor,
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,

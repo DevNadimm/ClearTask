@@ -2,12 +2,19 @@ import 'package:clear_task/core/constants/error_messages.dart';
 import 'package:clear_task/core/services/notification_controller.dart';
 import 'package:clear_task/data/models/task_model.dart';
 import 'package:clear_task/data/repositories/task_local_repository.dart';
+import 'package:clear_task/presentation/blocs/sync/sync_cubit.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
 import 'package:clear_task/presentation/blocs/task/task_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TaskBloc extends Bloc<TaskEvent, TaskState> {
   final TaskLocalRepository taskLocalRepository = TaskLocalRepository();
+  SyncCubit? _syncCubit;
+
+  /// Call this once to wire up auto-sync.
+  void setSyncCubit(SyncCubit syncCubit) {
+    _syncCubit = syncCubit;
+  }
 
   // Cache of all tasks
   List<Task> _cachedTasks = [];
@@ -36,6 +43,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         emit(TasksLoaded(List.from(_cachedTasks)));
 
         await NotificationController.scheduleTaskNotifications(event.task);
+        _syncCubit?.pushIfLoggedIn();
       } catch (e) {
         emit(TaskError(ErrorMessages.createFailed));
       }
@@ -63,6 +71,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
           if (updatedTask.sendNotification) {
             await NotificationController.scheduleTaskNotifications(updatedTask);
           }
+          _syncCubit?.pushIfLoggedIn();
         } else {
           emit(TaskError(ErrorMessages.taskNotFound));
         }
@@ -81,6 +90,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         emit(TasksLoaded(List.from(_cachedTasks)));
 
         await NotificationController.cancelScheduledTaskNotification(id: event.id);
+        _syncCubit?.pushIfLoggedIn();
       } catch (e) {
         emit(TaskError(ErrorMessages.deleteFailed));
       }
@@ -111,14 +121,18 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
           // If the task has subtasks, toggling is driven by subtask completion.
           if (event.task.subtasks.isNotEmpty) return;
 
-          Task updatedTask = event.task;
-          updatedTask.isCompleted = !updatedTask.isCompleted;
+          final bool newCompletedStatus = !event.task.isCompleted;
+          Task updatedTask = event.task.copyWith(
+            isCompleted: newCompletedStatus,
+            completedAt: newCompletedStatus ? DateTime.now().toIso8601String() : null,
+          );
           await taskLocalRepository.updateTask(updatedTask);
 
           int index = _cachedTasks.indexWhere((task) => task.id == updatedTask.id);
           if (index != -1) _cachedTasks[index] = updatedTask;
 
           emit(TasksLoaded(List.from(_cachedTasks)));
+          _syncCubit?.pushIfLoggedIn();
 
           bool isAllCompleted = _cachedTasks.length > 1 && _cachedTasks.every((task) => task.isCompleted);
           if (isAllCompleted) add(CelebrateAllTasksCompleted());
@@ -158,6 +172,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
           _cachedTasks[index].subtasks.add(saved);
         }
         emit(TasksLoaded(List.from(_cachedTasks)));
+        _syncCubit?.pushIfLoggedIn();
       } catch (e) {
         emit(TaskError(ErrorMessages.createFailed));
       }
@@ -166,18 +181,34 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     // Toggle a subtask's completion status
     on<ToggleSubtaskCompletion>((event, emit) async {
       try {
-        final updated = event.subtask.copyWith(isCompleted: !event.subtask.isCompleted);
-        await taskLocalRepository.updateSubtask(updated);
+        final updatedSubtask = event.subtask.copyWith(isCompleted: !event.subtask.isCompleted);
+        await taskLocalRepository.updateSubtask(updatedSubtask);
 
-        final taskIndex = _cachedTasks.indexWhere((t) => t.id == updated.taskId);
+        final taskIndex = _cachedTasks.indexWhere((t) => t.id == updatedSubtask.taskId);
         if (taskIndex != -1) {
-          final subtaskIndex = _cachedTasks[taskIndex].subtasks.indexWhere((s) => s.id == updated.id);
+          final task = _cachedTasks[taskIndex];
+          final subtaskIndex = task.subtasks.indexWhere((s) => s.id == updatedSubtask.id);
           if (subtaskIndex != -1) {
-            _cachedTasks[taskIndex].subtasks[subtaskIndex] = updated;
+            task.subtasks[subtaskIndex] = updatedSubtask;
+
+            // Update parent task completedAt if completion status changed
+            final bool isNowCompleted = task.isCompleted;
+            final bool hasCompletedAt = task.completedAt != null;
+
+            if (isNowCompleted && !hasCompletedAt) {
+              final updatedParent = task.copyWith(completedAt: DateTime.now().toIso8601String());
+              await taskLocalRepository.updateTask(updatedParent);
+              _cachedTasks[taskIndex] = updatedParent;
+            } else if (!isNowCompleted && hasCompletedAt) {
+              final updatedParent = task.copyWith(completedAt: null);
+              await taskLocalRepository.updateTask(updatedParent);
+              _cachedTasks[taskIndex] = updatedParent;
+            }
           }
         }
 
         emit(TasksLoaded(List.from(_cachedTasks)));
+        _syncCubit?.pushIfLoggedIn();
 
         // Check if all tasks (and their subtasks) are now completed
         bool isAllCompleted = _cachedTasks.length > 1 && _cachedTasks.every((task) => task.isCompleted);
@@ -196,6 +227,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
           _cachedTasks[taskIndex].subtasks.removeWhere((s) => s.id == event.subtask.id);
         }
         emit(TasksLoaded(List.from(_cachedTasks)));
+        _syncCubit?.pushIfLoggedIn();
       } catch (e) {
         emit(state);
       }

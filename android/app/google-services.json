@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "521019373070",
+    "project_id": "cleartask-e0930",
+    "storage_bucket": "cleartask-e0930.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521019373070:android:3e3e3ff75c6a9ae925ae5f",
+        "android_client_info": {
+          "package_name": "com.nadim.cleartask"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAE3qWvX4Zj9Qjr-xAz7Or3pCM_qzolco8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

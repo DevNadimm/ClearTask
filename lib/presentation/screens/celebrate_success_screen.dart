@@ -101,7 +101,7 @@ class _CelebrateSuccessScreenState extends State<CelebrateSuccessScreen> with Ti
                 style: GoogleFonts.poppins(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryFontColor,
+                  color: context.primaryFontColor,
                 ),
               ),
               const SizedBox(height: 12),
@@ -110,7 +110,7 @@ class _CelebrateSuccessScreenState extends State<CelebrateSuccessScreen> with Ti
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 14,
-                  color: AppColors.secondaryFontColor,
+                  color: context.secondaryFontColor,
                 ),
               ),
               const SizedBox(height: 40),
@@ -134,7 +134,7 @@ class _CelebrateSuccessScreenState extends State<CelebrateSuccessScreen> with Ti
                 child: Text(
                   'Skip',
                   style: GoogleFonts.poppins(
-                    color: AppColors.secondaryFontColor,
+                    color: context.secondaryFontColor,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

@@ -106,25 +106,25 @@ class _SearchTaskScreenState extends State<SearchTaskScreen> {
     return TextField(
       controller: _searchController,
       focusNode: _searchFocusNode,
-      style: GoogleFonts.poppins(color: AppColors.primaryFontColor),
+      style: GoogleFonts.poppins(color: context.primaryFontColor),
       onChanged: (value) {
         context.read<TaskBloc>().add(SearchTasks(value));
         setState(() {});
       },
       decoration: InputDecoration(
         hintText: 'Search tasks...',
-        hintStyle: GoogleFonts.poppins(color: AppColors.secondaryFontColor),
+        hintStyle: GoogleFonts.poppins(color: context.secondaryFontColor),
         filled: true,
-        fillColor: AppColors.cardColor,
-        prefixIcon: const Icon(
+        fillColor: context.cardColor,
+        prefixIcon: Icon(
           HugeIcons.strokeRoundedSearch01,
-          color: AppColors.secondaryFontColor,
+          color: context.secondaryFontColor,
         ),
         suffixIcon: _searchController.text.isNotEmpty
             ? IconButton(
-                icon: const Icon(
+                icon: Icon(
                   HugeIcons.strokeRoundedCancel01,
-                  color: AppColors.secondaryFontColor,
+                  color: context.secondaryFontColor,
                 ),
                 onPressed: () {
                   _searchController.clear();
