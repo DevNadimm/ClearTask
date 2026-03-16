@@ -20,9 +20,9 @@ class BottomSheetWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.cardColor,
-        borderRadius: BorderRadius.vertical(
+      decoration: BoxDecoration(
+        color: context.cardColor,
+        borderRadius: const BorderRadius.vertical(
           top: Radius.circular(32),
         ),
       ),
@@ -40,7 +40,7 @@ class BottomSheetWidget extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.primaryFontColor,
+                    color: context.primaryFontColor,
                   ),
                 ),
                 IconButton(
@@ -64,7 +64,7 @@ class BottomSheetWidget extends StatelessWidget {
                     child: Material(
                       color: isSelected
                           ? AppColors.primaryColor.withValues(alpha: 0.2)
-                          : AppColors.inputBorderColor.withValues(alpha: 0.2),
+                          : context.inputBorderColor.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                       child: InkWell(
                         splashColor: AppColors.primaryColorTransparent,
@@ -86,7 +86,7 @@ class BottomSheetWidget extends StatelessWidget {
                               "${getTaskTypeEmoji(taskType)} $taskType",
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
-                                color: AppColors.primaryFontColor,
+                                color: context.primaryFontColor,
                               ),
                             ),
                           ),

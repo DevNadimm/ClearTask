@@ -1,5 +1,9 @@
 import 'package:clear_task/core/utils/theme/theme.dart';
+import 'package:clear_task/presentation/blocs/auth/auth_cubit.dart';
+import 'package:clear_task/presentation/blocs/sync/sync_cubit.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
+import 'package:clear_task/presentation/blocs/task/task_event.dart';
+import 'package:clear_task/presentation/blocs/theme/theme_cubit.dart';
 import 'package:clear_task/presentation/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,12 +17,35 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => TaskBloc()),
+        BlocProvider(create: (_) => ThemeCubit()),
+        BlocProvider(create: (_) => AuthCubit()),
+        BlocProvider(create: (_) => SyncCubit()),
       ],
-      child: GetMaterialApp(
-        title: 'ClearTask',
-        theme: theme,
-        debugShowCheckedModeBanner: false,
-        home: const SplashScreen(),
+      child: Builder(
+        builder: (ctx) {
+          // Wire SyncCubit → TaskBloc so task CRUD auto-syncs
+          final syncCubit = ctx.read<SyncCubit>();
+          final taskBloc = ctx.read<TaskBloc>();
+          taskBloc.setSyncCubit(syncCubit);
+
+          // After cloud sync (especially pull), reload tasks in the UI
+          syncCubit.onSyncComplete = () {
+            taskBloc.add(FetchTasks());
+          };
+
+          return BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              return GetMaterialApp(
+                title: 'ClearTask',
+                theme: lightTheme,
+                darkTheme: darkTheme,
+                themeMode: themeMode,
+                debugShowCheckedModeBanner: false,
+                home: const SplashScreen(),
+              );
+            },
+          );
+        },
       ),
     );
   }

@@ -50,7 +50,7 @@ class CustomTextField extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppColors.primaryFontColor,
+                color: context.primaryFontColor,
               ),
             ),
             if (isRequired)
@@ -68,12 +68,12 @@ class CustomTextField extends StatelessWidget {
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
-          style: GoogleFonts.poppins(color: AppColors.primaryFontColor),
+          style: GoogleFonts.poppins(color: context.primaryFontColor),
           readOnly: readOnly,
           onTap: onTap,
           decoration: InputDecoration(
             hintText: effectiveHint,
-            hintStyle: GoogleFonts.poppins(color: AppColors.secondaryFontColor),
+            hintStyle: GoogleFonts.poppins(color: context.secondaryFontColor),
             suffixText: suffixText,
             border: const OutlineInputBorder(),
             prefixIcon: prefixIcon,

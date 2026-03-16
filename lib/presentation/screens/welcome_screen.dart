@@ -40,7 +40,7 @@ class WelcomeScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primaryFontColor,
+                      color: context.primaryFontColor,
                     ),
                   ),
                   Text(
@@ -48,7 +48,7 @@ class WelcomeScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       fontSize: 14,
-                      color: AppColors.secondaryFontColor,
+                      color: context.secondaryFontColor,
                       height: 1.2,
                     ),
                   ),

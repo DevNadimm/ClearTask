@@ -73,7 +73,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     style: GoogleFonts.poppins(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primaryFontColor,
+                      color: context.primaryFontColor,
                     ),
                   ),
                 ],
@@ -89,7 +89,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 "Simplify your day",
                 style: GoogleFonts.poppins(
                   fontSize: 16,
-                  color: AppColors.secondaryFontColor,
+                  color: context.secondaryFontColor,
                 ),
               ),
             ),

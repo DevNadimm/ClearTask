@@ -20,9 +20,19 @@ class AuthFooter extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: AppColors.secondaryFontColor,
+          style: TextStyle(
+            color: context.secondaryFontColor,
             fontWeight: FontWeight.w500,
+          ),
+        ),
+        GestureDetector(
+          onTap: onTap,
+          child: const Text(
+            '',
+            style: TextStyle(
+              color: AppColors.primaryColor,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         GestureDetector(

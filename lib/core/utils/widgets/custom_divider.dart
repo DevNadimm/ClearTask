@@ -15,9 +15,9 @@ class CustomDivider extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.inputBorderColor.withValues(alpha: 0.1),
-            AppColors.inputBorderColor,
-            AppColors.inputBorderColor.withValues(alpha: 0.1),
+            context.inputBorderColor.withValues(alpha: 0.1),
+            context.inputBorderColor,
+            context.inputBorderColor.withValues(alpha: 0.1),
           ],
         ),
       ),
