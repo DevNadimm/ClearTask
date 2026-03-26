@@ -118,7 +118,7 @@ Task(
   }
 
   static Map<String, dynamic> toMap(Task task) {
-    final map = {
+    final map = <String, dynamic>{
       'title': task.title,
       'dueDate': task.dueDate,
       'taskType': task.taskType,
@@ -126,14 +126,14 @@ Task(
       'sendNotification': task.sendNotification ? 1 : 0,
       'notificationTime': task.notificationTime,
       'completedAt': task.completedAt,
-      'cloudId': task.cloudId,
       'isSynced': task.isSynced ? 1 : 0,
       'isDeleted': task.isDeleted ? 1 : 0,
-      'calendarEventId': task.calendarEventId,
       // Persist the stored value (not the computed getter) so plain tasks work.
       'isCompleted': task._isCompleted ? 1 : 0,
     };
     if (task.id != null) map['id'] = task.id;
+    if (task.cloudId != null) map['cloudId'] = task.cloudId;
+    if (task.calendarEventId != null) map['calendarEventId'] = task.calendarEventId;
     return map;
   }
 

@@ -287,11 +287,11 @@ class _CreateTaskViewState extends State<CreateTaskView> {
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: context.inputBorderColor.withValues(alpha: 0.15),
+                  color: context.cardColor, //context.inputBorderColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: context.inputBorderColor,
-                    width: 1,
+                    width: 1.4,
                   ),
                 ),
                 child: Row(

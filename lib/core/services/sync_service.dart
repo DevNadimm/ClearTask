@@ -9,6 +9,10 @@ class SyncService {
   /// Push all unsynced local tasks (with subtasks) to Firestore.
   Future<void> pushToCloud(String userId) async {
     final unsynced = await _dbHelper.fetchUnsyncedTasks();
+    if (unsynced.isEmpty) {
+      debugPrint('🔄 Sync: No unsynced tasks to push');
+      return;
+    }
     debugPrint('🔄 Sync: ${unsynced.length} unsynced tasks to push');
 
     final collection =
@@ -20,32 +24,38 @@ class SyncService {
       final cloudId = map['cloudId'] as String?;
       final isDeleted = (map['isDeleted'] as int?) == 1;
 
-      if (isDeleted && cloudId != null) {
-        await collection.doc(cloudId).delete();
-        await _dbHelper.markSynced(localId, cloudId);
-        debugPrint('  ☁️ Deleted cloud task: $cloudId');
-      } else if (cloudId != null) {
-        // Fetch subtasks for this task
-        final subtaskMaps = await db.query(
-          'tbl_subtask',
-          where: 'taskId = ?',
-          whereArgs: [localId],
-        );
-        await collection
-            .doc(cloudId)
-            .set(_toFirestoreMap(map, subtaskMaps));
-        await _dbHelper.markSynced(localId, cloudId);
-        debugPrint('  ☁️ Updated cloud task: $cloudId');
-      } else if (!isDeleted) {
-        final subtaskMaps = await db.query(
-          'tbl_subtask',
-          where: 'taskId = ?',
-          whereArgs: [localId],
-        );
-        final docRef =
-            await collection.add(_toFirestoreMap(map, subtaskMaps));
-        await _dbHelper.markSynced(localId, docRef.id);
-        debugPrint('  ☁️ Created cloud task: ${docRef.id}');
+      try {
+        if (isDeleted && cloudId != null) {
+          debugPrint('  ☁️ Deleting cloud task: $cloudId (localId: $localId)');
+          await collection.doc(cloudId).delete();
+          await _dbHelper.markSynced(localId, cloudId);
+          debugPrint('  ☁️ Deleted cloud task successfully: $cloudId');
+        } else if (cloudId != null) {
+          debugPrint('  ☁️ Updating cloud task: $cloudId (localId: $localId)');
+          final subtaskMaps = await db.query(
+            'tbl_subtask',
+            where: 'taskId = ?',
+            whereArgs: [localId],
+          );
+          await collection
+              .doc(cloudId)
+              .set(_toFirestoreMap(map, subtaskMaps));
+          await _dbHelper.markSynced(localId, cloudId);
+          debugPrint('  ☁️ Updated cloud task successfully: $cloudId');
+        } else if (!isDeleted) {
+          debugPrint('  ☁️ Creating NEW cloud task for localId: $localId');
+          final subtaskMaps = await db.query(
+            'tbl_subtask',
+            where: 'taskId = ?',
+            whereArgs: [localId],
+          );
+          final docRef =
+              await collection.add(_toFirestoreMap(map, subtaskMaps));
+          await _dbHelper.markSynced(localId, docRef.id);
+          debugPrint('  ☁️ Created cloud task successfully: ${docRef.id} for localId: $localId');
+        }
+      } catch (e) {
+        debugPrint('  ❌ Error syncing task $localId: $e');
       }
     }
 

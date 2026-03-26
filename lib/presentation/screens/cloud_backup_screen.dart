@@ -140,7 +140,7 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
                         color: AppColors.primaryColor.withValues(alpha: 0.1),
                         child: user.photoURL != null
                             ? Image.network(user.photoURL!, fit: BoxFit.cover)
-                            : Icon(HugeIcons.strokeRoundedUser03,
+                            : const Icon(HugeIcons.strokeRoundedUser03,
                                 size: 40, color: AppColors.primaryColor),
                       ),
                     ),
@@ -279,7 +279,7 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
               color: AppColors.primaryColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               HugeIcons.strokeRoundedCloud,
               size: 70,
               color: AppColors.primaryColor,
