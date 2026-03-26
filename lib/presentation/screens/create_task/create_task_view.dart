@@ -9,6 +9,7 @@ import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
 import 'package:clear_task/presentation/widgets/bottom_sheet_widget.dart';
 import 'package:clear_task/presentation/widgets/custom_text_field.dart';
+import 'package:clear_task/presentation/widgets/rich_text_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -32,9 +33,14 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   final TextEditingController taskType = TextEditingController();
   final TextEditingController dueDate = TextEditingController();
   final TextEditingController notificationDateAndTime = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final FocusNode _noteFocusNode = FocusNode();
+  final GlobalKey _noteKey = GlobalKey();
 
   /// New subtask fields (not yet persisted).
   final List<TextEditingController> _newSubtaskControllers = [];
+  final List<FocusNode> _subtaskFocusNodes = [];
+  final List<GlobalKey> _subtaskKeys = [];
 
   /// Copy of existing subtasks shown when editing (mutated by delete).
   late List<Subtask> _existingSubtasks;
@@ -44,6 +50,9 @@ class _CreateTaskViewState extends State<CreateTaskView> {
 
   bool _isGeneratingSubtasks = false;
   String _selectedPriority = 'none';
+
+  /// Rich text note stored as Delta JSON string.
+  String? _noteJson;
 
   static const List<String> _priorities = ['none', 'low', 'medium', 'high'];
 
@@ -59,6 +68,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
       title.text = t.title;
       taskType.text = t.taskType;
       _selectedPriority = t.priority;
+      _noteJson = t.note;
 
       if (t.dueDate != null) {
         dueDate.text = DateFormatter.toLongMonthDayYear(t.dueDate!);
@@ -67,9 +77,26 @@ class _CreateTaskViewState extends State<CreateTaskView> {
         notificationDateAndTime.text = DateFormatter.toLongMonthDayYearTime(t.notificationTime!);
       }
 
-      // Seed the notification cubit once the widget tree is ready.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<NotificationCubit>().toggleNotification(t.sendNotification);
+      });
+    }
+
+    _noteFocusNode.addListener(_onNoteFocusChange);
+  }
+
+  void _onNoteFocusChange() {
+    if (_noteFocusNode.hasFocus) {
+      // Small delay to allow the keyboard to show up and layout to adjust
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (_noteKey.currentContext != null) {
+          Scrollable.ensureVisible(
+            _noteKey.currentContext!,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+            alignment: 0.0, // 0.0 means top of viewport
+          );
+        }
       });
     }
   }
@@ -83,14 +110,52 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     for (final c in _newSubtaskControllers) {
       c.dispose();
     }
+    for (final f in _subtaskFocusNodes) {
+      f.dispose();
+    }
+    _noteFocusNode.removeListener(_onNoteFocusChange);
+    _noteFocusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
-  void _addSubtaskField() => setState(() => _newSubtaskControllers.add(TextEditingController()));
+  void _addSubtaskField() {
+    setState(() {
+      final controller = TextEditingController();
+      final focusNode = FocusNode();
+      final key = GlobalKey();
+      
+      _newSubtaskControllers.add(controller);
+      _subtaskFocusNodes.add(focusNode);
+      _subtaskKeys.add(key);
+
+      focusNode.addListener(() => _onSubtaskFocusChange(focusNode, key));
+    });
+  }
+
+  void _onSubtaskFocusChange(FocusNode node, GlobalKey key) {
+    if (node.hasFocus) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (key.currentContext != null) {
+          Scrollable.ensureVisible(
+            key.currentContext!,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+            alignment: 0.0,
+          );
+        }
+      });
+    }
+  }
 
   void _removeNewSubtaskField(int index) {
     _newSubtaskControllers[index].dispose();
-    setState(() => _newSubtaskControllers.removeAt(index));
+    _subtaskFocusNodes[index].dispose();
+    setState(() {
+      _newSubtaskControllers.removeAt(index);
+      _subtaskFocusNodes.removeAt(index);
+      _subtaskKeys.removeAt(index);
+    });
   }
 
   void _deleteExistingSubtask(Subtask subtask) {
@@ -119,7 +184,14 @@ class _CreateTaskViewState extends State<CreateTaskView> {
         setState(() {
           for (final subtaskTitle in generatedSubtasks) {
             final controller = TextEditingController(text: subtaskTitle);
+            final focusNode = FocusNode();
+            final key = GlobalKey();
+            
             _newSubtaskControllers.add(controller);
+            _subtaskFocusNodes.add(focusNode);
+            _subtaskKeys.add(key);
+            
+            focusNode.addListener(() => _onSubtaskFocusChange(focusNode, key));
           }
         });
       } else {
@@ -157,6 +229,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
       // ── Edit mode ──────────────────────────────────────────────────────────
       final updatedTask = widget.editTask!.copyWith(
         title: title.text,
+        note: _noteJson,
         taskType: taskType.text,
         priority: _selectedPriority,
         dueDate: dueDate.text.isNotEmpty
@@ -194,6 +267,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
       // ── Create mode ────────────────────────────────────────────────────────
       final task = Task(
         title: title.text,
+        note: _noteJson,
         taskType: taskType.text,
         priority: _selectedPriority,
         dueDate: dueDate.text.isNotEmpty
@@ -238,6 +312,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
         title: Text(_isEditing ? "Edit Task" : "Create Task"),
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _globalKey,
@@ -340,17 +415,23 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                 validationLabel: "Due date",
                 readOnly: true,
                 onTap: () async {
-                  DateTime initialDate = DateTime.now();
+                  DateTime now = DateTime.now();
+                  DateTime initialDate = now;
                   if (dueDate.text.isNotEmpty) {
                     initialDate =
                         DateTime.parse(DateFormatter.toRawDateTime(dueDate.text));
                   }
+                  
+                  // If initialDate is in the past, we must set firstDate to initialDate (or earlier) 
+                  // to avoid Flutter throwing an error.
+                  DateTime firstDate = initialDate.isBefore(now) ? initialDate : now;
+
                   DateTime? selected = await showDatePicker(
                     context: context,
                     initialDate: initialDate,
-                    firstDate: DateTime.now(),
+                    firstDate: firstDate,
                     lastDate:
-                        DateTime.now().add(const Duration(days: 365 * 2)),
+                        now.add(const Duration(days: 365 * 2)),
                   );
                   if (selected != null) {
                     dueDate.text =
@@ -407,6 +488,15 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                     ],
                   );
                 },
+              ),
+
+              // ── Note (Rich Text) section ────────────────────────────────
+              const SizedBox(height: 24),
+              RichTextEditor(
+                key: _noteKey,
+                focusNode: _noteFocusNode,
+                initialDeltaJson: _noteJson,
+                onChanged: (json) => _noteJson = json,
               ),
 
               // ── Subtasks section ───────────────────────────────────────────
@@ -542,12 +632,14 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                 itemCount: _newSubtaskControllers.length,
                 itemBuilder: (context, index) {
                   return Padding(
+                    key: _subtaskKeys[index],
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     child: Row(
                       children: [
                         Expanded(
                           child: TextFormField(
                             controller: _newSubtaskControllers[index],
+                            focusNode: _subtaskFocusNodes[index],
                             style: GoogleFonts.poppins(color: context.primaryFontColor),
                             decoration: InputDecoration(
                               hintText: "New subtask ${index + 1}",
@@ -587,7 +679,8 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   }
 
   Future<String?> pickDateTime(BuildContext context) async {
-    DateTime initialDate = DateTime.now();
+    DateTime now = DateTime.now();
+    DateTime initialDate = now;
     TimeOfDay initialTime = TimeOfDay.now();
 
     if (notificationDateAndTime.text.isNotEmpty) {
@@ -596,15 +689,22 @@ class _CreateTaskViewState extends State<CreateTaskView> {
       initialTime = TimeOfDay(hour: parsed.hour, minute: parsed.minute);
     }
 
-    DateTime lastDate = DateTime.now().add(const Duration(days: 30));
+    // firstDate must be <= initialDate
+    DateTime firstDate = initialDate.isBefore(now) ? initialDate : now;
+
+    // lastDate must be >= initialDate
+    DateTime lastDate = now.add(const Duration(days: 30));
     if (dueDate.text.isNotEmpty) {
       lastDate = DateTime.parse(DateFormatter.toRawDateTime(dueDate.text));
+    }
+    if (lastDate.isBefore(firstDate)) {
+      lastDate = firstDate.add(const Duration(days: 30));
     }
 
     final DateTime? selectedDate = await showDatePicker(
       context: context,
       initialDate: initialDate,
-      firstDate: DateTime.now(),
+      firstDate: firstDate,
       lastDate: lastDate,
     );
     if (selectedDate == null) return null;

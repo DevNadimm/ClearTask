@@ -82,6 +82,7 @@ class SyncService {
         final data = doc.data();
         final taskId = await db.insert('tbl_task', {
           'title': data['title'] ?? '',
+          'note': data['note'],
           'taskType': data['taskType'] ?? 'General',
           'priority': data['priority'] ?? 'none',
           'sendNotification': data['sendNotification'] ?? 0,
@@ -126,6 +127,7 @@ class SyncService {
   ) {
     return {
       'title': localMap['title'],
+      'note': localMap['note'],
       'taskType': localMap['taskType'],
       'priority': localMap['priority'],
       'sendNotification': localMap['sendNotification'],

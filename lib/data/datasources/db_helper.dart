@@ -14,7 +14,7 @@ class DBHelper {
 
     _db = await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -27,6 +27,7 @@ class DBHelper {
       CREATE TABLE tbl_task (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
+        note TEXT,
         taskType TEXT NOT NULL,
         priority TEXT DEFAULT 'none',
         sendNotification INTEGER NOT NULL,
@@ -84,6 +85,11 @@ class DBHelper {
       await db.execute('ALTER TABLE tbl_task ADD COLUMN isDeleted INTEGER DEFAULT 0');
       await db.execute('ALTER TABLE tbl_task ADD COLUMN calendarEventId TEXT');
       debugPrint('🔄 Database upgraded to v5: sync columns added');
+    }
+
+    if (oldVersion < 6) {
+      await db.execute('ALTER TABLE tbl_task ADD COLUMN note TEXT');
+      debugPrint('🔄 Database upgraded to v6: note column added to tbl_task');
     }
   }
 

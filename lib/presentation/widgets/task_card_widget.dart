@@ -8,6 +8,7 @@ import 'package:clear_task/data/models/task_model.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
 import 'package:clear_task/presentation/screens/create_task/create_task_screen.dart';
+import 'package:clear_task/presentation/widgets/rich_text_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -31,6 +32,7 @@ class TaskCardWidget extends StatelessWidget {
     final hasPriority = task.priority != 'none';
     final hasSubtasks = task.subtasks.isNotEmpty;
     final completedCount = task.subtasks.where((s) => s.isCompleted).length;
+    final hasNote = task.note != null && task.note!.isNotEmpty;
 
     return GestureDetector(
       onTap: () {
@@ -170,6 +172,11 @@ class TaskCardWidget extends StatelessWidget {
                               const Icon(HugeIcons.strokeRoundedNotification03,
                                   size: 16, color: Colors.orangeAccent),
                             ],
+                            if (hasNote) ...[
+                              const SizedBox(width: 8),
+                              Icon(HugeIcons.strokeRoundedNote,
+                                  size: 16, color: context.secondaryFontColor),
+                            ],
                             const Spacer(),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -228,174 +235,232 @@ class TaskCardWidget extends StatelessWidget {
   }
 
   void showBottomModal(BuildContext context, bool hasPriority, Color priorityColor, Color taskTypeColor) {
+    final contentKey = GlobalKey();
+    double initialSize = 0.5;
+
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       builder: (_) {
-        return Material(
-          color: context.cardColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          child: Padding(
-            padding: const EdgeInsets.all(28),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  height: 4,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    color: context.secondaryFontColor.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                const SizedBox(height: 28),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: taskTypeColor.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        getTaskTypeEmoji(task.taskType),
-                        style: const TextStyle(fontSize: 30),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            task.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.poppins(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: context.primaryFontColor,
-                              height: 1.2,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final box = contentKey.currentContext?.findRenderObject() as RenderBox?;
+              if (box != null) {
+                final screenHeight = MediaQuery.of(context).size.height;
+                final contentHeight = box.size.height;
+                final newSize = (contentHeight / screenHeight).clamp(0.45, 0.85);
+                if ((newSize - initialSize).abs() > 0.01) {
+                  setState(() => initialSize = newSize);
+                }
+              }
+            });
+
+            return DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: initialSize,
+              minChildSize: 0.45,
+              maxChildSize: 0.85,
+              builder: (_, scrollController) {
+                return Material(
+                  color: context.cardColor,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(28),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            controller: scrollController,
+                            child: Column(
+                              key: contentKey, // 👈 এখানে measure হবে
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Center(
+                                  child: Container(
+                                    height: 4,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                      color: context.secondaryFontColor.withValues(alpha: 0.7),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 28),
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: taskTypeColor.withValues(alpha: 0.2),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        getTaskTypeEmoji(task.taskType),
+                                        style: const TextStyle(fontSize: 30),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            task.title,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              color: context.primaryFontColor,
+                                              height: 1.2,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            "${task.taskType[0].toUpperCase()}${task.taskType.substring(1)}",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: taskTypeColor,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 22),
+                                const CustomDivider(),
+                                const SizedBox(height: 22),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      HugeIcons.strokeRoundedCalendar04,
+                                      size: 18,
+                                      color: context.secondaryFontColor.withValues(alpha: 0.8),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      task.dueDate != null
+                                          ? DateFormatter.toLongMonthDayYear(task.dueDate.toString())
+                                          : "Anytime",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        color: context.secondaryFontColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (task.sendNotification) ...[
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        HugeIcons.strokeRoundedNotification03,
+                                        size: 18,
+                                        color: context.secondaryFontColor.withValues(alpha: 0.8),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        DateFormatter.toLongMonthDayYearTime(task.notificationTime.toString()),
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14,
+                                          color: context.secondaryFontColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                                if (hasPriority) ...[
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 10,
+                                        height: 10,
+                                        decoration: BoxDecoration(
+                                          color: priorityColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        "${task.priority[0].toUpperCase()}${task.priority.substring(1)} Priority",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14,
+                                          color: priorityColor,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                                if (task.note != null && task.note!.isNotEmpty) ...[
+                                  const SizedBox(height: 22),
+                                  const CustomDivider(),
+                                  const SizedBox(height: 22),
+                                  RichTextEditor(
+                                    initialDeltaJson: task.note,
+                                    readOnly: true,
+                                    scrollable: false,
+                                  ),
+                                ],
+                                const SizedBox(height: 28),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "${task.taskType[0].toUpperCase()}${task.taskType.substring(1)}",
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: taskTypeColor,
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Get.back();
+                                  Get.to(() => CreateTaskScreen(editTask: task));
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: const Size.fromHeight(50),
+                                ),
+                                child: Text("Edit Task", style: GoogleFonts.poppins()),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 22),
-                const CustomDivider(),
-                const SizedBox(height: 22),
-                Row(
-                  children: [
-                    Icon(
-                      HugeIcons.strokeRoundedCalendar04,
-                      size: 18,
-                      color: context.secondaryFontColor.withValues(alpha: 0.8),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Get.back();
+                                  context.read<TaskBloc>().add(DeleteTask(task.id!));
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.redAccent,
+                                  foregroundColor: Colors.white,
+                                  minimumSize: const Size.fromHeight(50),
+                                ),
+                                child: Text(
+                                  "Delete Task",
+                                  style: GoogleFonts.poppins(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      task.dueDate != null
-                          ? DateFormatter.toLongMonthDayYear(task.dueDate.toString())
-                          : "Anytime",
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: context.secondaryFontColor,
-                      ),
-                    ),
-                  ],
-                ),
-                if (task.sendNotification) ...[
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        HugeIcons.strokeRoundedNotification03,
-                        size: 18,
-                        color: context.secondaryFontColor.withValues(alpha: 0.8),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        DateFormatter.toLongMonthDayYearTime(task.notificationTime.toString()),
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: context.secondaryFontColor,
-                        ),
-                      ),
-                    ],
                   ),
-                ],
-                if (hasPriority) ...[
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: priorityColor,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        "${task.priority[0].toUpperCase()}${task.priority.substring(1)} Priority",
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: priorityColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-                const SizedBox(height: 28),
-                ElevatedButton(
-                  onPressed: () {
-                    Get.back();
-                    Get.to(() => CreateTaskScreen(editTask: task));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                  ),
-                  child: Text("Edit Task", style: GoogleFonts.poppins()),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    Get.back();
-                    context.read<TaskBloc>().add(DeleteTask(task.id!));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size.fromHeight(50),
-                  ),
-                  child: Text(
-                    "Delete Task",
-                    style: GoogleFonts.poppins(),
-                  ),
-                ),
-                const SizedBox(height: 8),
-              ],
-            ),
-          ),
+                );
+              },
+            );
+          },
         );
       },
     );
-  }
-}
+  }}
 
 // ── Subtask row widget ─────────────────────────────────────────────────────────
 

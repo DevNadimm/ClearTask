@@ -48,6 +48,7 @@ class Subtask {
 class Task {
   int? id;
   final String title;
+  final String? note;
   final String? dueDate;
   final String taskType;
   final String priority;
@@ -70,6 +71,7 @@ class Task {
   Task({
     this.id,
     required this.title,
+    this.note,
     this.dueDate,
     required this.taskType,
     this.priority = 'none',
@@ -120,6 +122,7 @@ Task(
   static Map<String, dynamic> toMap(Task task) {
     final map = <String, dynamic>{
       'title': task.title,
+      'note': task.note,
       'dueDate': task.dueDate,
       'taskType': task.taskType,
       'priority': task.priority,
@@ -141,6 +144,7 @@ Task(
     return Task(
       id: map['id'],
       title: map['title'],
+      note: map['note'],
       dueDate: map['dueDate'],
       taskType: map['taskType'],
       priority: map['priority'] ?? 'none',
@@ -158,11 +162,12 @@ Task(
   Task copyWith({
     int? id,
     String? title,
+    Object? note = _sentinel,
     String? dueDate,
     String? taskType,
     String? priority,
     bool? sendNotification,
-    String? notificationTime,
+    Object? notificationTime = _sentinel,
     String? completedAt,
     String? cloudId,
     bool? isSynced,
@@ -174,11 +179,14 @@ Task(
     return Task(
       id: id ?? this.id,
       title: title ?? this.title,
+      note: note == _sentinel ? this.note : (note as String?),
       dueDate: dueDate ?? this.dueDate,
       taskType: taskType ?? this.taskType,
       priority: priority ?? this.priority,
       sendNotification: sendNotification ?? this.sendNotification,
-      notificationTime: notificationTime ?? this.notificationTime,
+      notificationTime: notificationTime == _sentinel
+          ? this.notificationTime
+          : (notificationTime as String?),
       completedAt: completedAt ?? this.completedAt,
       cloudId: cloudId ?? this.cloudId,
       isSynced: isSynced ?? this.isSynced,
@@ -188,4 +196,6 @@ Task(
       subtasks: subtasks ?? this.subtasks,
     );
   }
+
+  static const _sentinel = Object();
 }

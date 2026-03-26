@@ -10,6 +10,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'package:intl/intl.dart';
 
@@ -139,8 +141,21 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
                         height: 80,
                         color: AppColors.primaryColor.withValues(alpha: 0.1),
                         child: user.photoURL != null
-                            ? Image.network(user.photoURL!, fit: BoxFit.cover)
-                            : const Icon(HugeIcons.strokeRoundedUser03,
+                            ? CachedNetworkImage(
+                                imageUrl: user.photoURL!,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Shimmer.fromColors(
+                                  baseColor: context.inputBorderColor.withValues(alpha: 0.2),
+                                  highlightColor: context.cardColor,
+                                  child: Container(color: Colors.white),
+                                ),
+                                errorWidget: (context, url, error) => const Icon(
+                                  Icons.person_rounded,
+                                  size: 40,
+                                  color: AppColors.primaryColor,
+                                ),
+                              )
+                            : const Icon(Icons.person_rounded,
                                 size: 40, color: AppColors.primaryColor),
                       ),
                     ),
