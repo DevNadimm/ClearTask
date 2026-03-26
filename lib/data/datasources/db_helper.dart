@@ -149,9 +149,19 @@ class DBHelper {
 
   Future<int> deleteAllTasks() async {
     final Database db = await initDB();
+    
+    // Mark ALL tasks as deleted and unsynced so the sync service can decide what to do.
+    // Synced tasks (cloudId != null) will be deleted from cloud.
+    // Unsynced tasks (cloudId == null) will just be purged locally.
+    int count = await db.update(
+      "tbl_task", 
+      {'isDeleted': 1, 'isSynced': 0}
+    );
+
+    // Subtasks can be hard-deleted locally as they are synced as part of the task object.
     await db.delete("tbl_subtask");
-    final int count = await db.delete("tbl_task");
-    debugPrint('🗑️ Deleted all tasks, affected rows: $count');
+
+    debugPrint('🗑️ Marked all tasks for deletion: $count rows');
     return count;
   }
 
@@ -224,14 +234,16 @@ class DBHelper {
   /// Hard-delete tasks that are marked as deleted AND synced.
   Future<void> purgeDeletedSyncedTasks() async {
     final Database db = await initDB();
-    final rows = await db.query("tbl_task",
-        where: "isDeleted = ? AND isSynced = ?", whereArgs: [1, 1]);
-    for (final row in rows) {
-      final id = row['id'] as int;
-      await db.delete("tbl_subtask", where: "taskId = ?", whereArgs: [id]);
+    
+    // Case 1: Synced tasks that were deleted (isSynced=1 means pushToCloud just finished deleting them)
+    // Case 2: Unsynced tasks that were deleted (cloudId IS NULL means they never reached the cloud)
+    int count = await db.delete("tbl_task",
+        where: "isDeleted = ? AND (isSynced = ? OR cloudId IS NULL)", 
+        whereArgs: [1, 1]);
+        
+    if (count > 0) {
+      debugPrint('🧹 Purged $count deleted tasks from local database');
     }
-    await db.delete("tbl_task",
-        where: "isDeleted = ? AND isSynced = ?", whereArgs: [1, 1]);
   }
 
   /// Save calendarEventId for a task.

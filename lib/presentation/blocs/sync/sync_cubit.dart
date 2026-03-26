@@ -66,9 +66,13 @@ class SyncCubit extends Cubit<SyncState> {
   }
 
   Future<void> sync(String userId) async {
-    if (state.status == SyncStatus.syncing) return;
-    _userId = userId;
+    if (state.status == SyncStatus.syncing) {
+      debugPrint('⚠️ Sync skipped: already syncing');
+      return;
+    }
     emit(state.copyWith(status: SyncStatus.syncing));
+    
+    _userId = userId;
     try {
       await _syncService.fullSync(userId);
       emit(state.copyWith(status: SyncStatus.synced, lastSynced: DateTime.now()));
@@ -81,15 +85,23 @@ class SyncCubit extends Cubit<SyncState> {
   }
 
   Future<void> pushIfLoggedIn() async {
-    if (_userId == null) return;
+    if (_userId == null || state.status == SyncStatus.syncing) return;
+    
+    emit(state.copyWith(status: SyncStatus.syncing));
+    
     final connectivity = await Connectivity().checkConnectivity();
     if (connectivity.any((r) => r != ConnectivityResult.none)) {
       try {
         await _syncService.pushToCloud(_userId!);
         emit(state.copyWith(status: SyncStatus.synced, lastSynced: DateTime.now()));
+        onSyncComplete?.call();
+        debugPrint('✅ Background push complete');
       } catch (e) {
         debugPrint('⚠️ Background push failed: $e');
+        emit(state.copyWith(status: SyncStatus.error));
       }
+    } else {
+      emit(state.copyWith(status: SyncStatus.idle));
     }
   }
 

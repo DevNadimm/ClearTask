@@ -22,7 +22,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   TaskBloc() : super(TaskInitial()) {
     // Fetch all tasks
     on<FetchTasks>((event, emit) async {
-      emit(TaskLoading());
+      if (state is! TasksLoaded) {
+        emit(TaskLoading());
+      }
       try {
         final tasks = await taskLocalRepository.fetchTasks();
         _cachedTasks = tasks;
@@ -109,6 +111,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         _cachedTasks.clear();
         emit(AllTasksDeleted());
         emit(TasksLoaded([]));
+        _syncCubit?.pushIfLoggedIn();
       } catch (e) {
         emit(TaskError(ErrorMessages.deleteAllFailed));
       }
