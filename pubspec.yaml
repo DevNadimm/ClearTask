@@ -37,6 +37,9 @@ dependencies:
   googleapis_auth: ^1.6.0
   extension_google_sign_in_as_googleapis_auth: ^2.0.12
   smooth_page_indicator: ^2.0.1
+  flutter_quill: ^11.0.0
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
