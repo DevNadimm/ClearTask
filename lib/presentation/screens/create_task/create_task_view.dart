@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/core/constants/task_type.dart';
 import 'package:clear_task/core/utils/formatter/date_formatter.dart';
@@ -16,6 +17,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:clear_task/data/services/ai_service.dart';
+import 'package:clear_task/presentation/blocs/premium/premium_cubit.dart';
+import 'package:clear_task/presentation/widgets/ai_limit_dialog.dart';
 
 class CreateTaskView extends StatefulWidget {
   /// When [editTask] is provided the view runs in edit mode.
@@ -176,10 +179,43 @@ class _CreateTaskViewState extends State<CreateTaskView> {
       return;
     }
 
+    final premiumCubit = context.read<PremiumCubit>();
+    if (!premiumCubit.state.canUseAi) {
+      AiLimitDialog.show(context);
+      return;
+    }
+
     setState(() => _isGeneratingSubtasks = true);
 
+    final allowed = await premiumCubit.tryUseAi();
+    if (!allowed) {
+      if (mounted) setState(() => _isGeneratingSubtasks = false);
+      AiLimitDialog.show(context);
+      return;
+    }
+
     try {
-      final generatedSubtasks = await AiService.generateSubtasks(title.text);
+      String? cleanNote;
+      if (_noteJson != null && _noteJson!.isNotEmpty) {
+        try {
+          final List<dynamic> delta = jsonDecode(_noteJson!);
+          final buffer = StringBuffer();
+          for (final op in delta) {
+            if (op['insert'] is String) {
+              buffer.write(op['insert']);
+            }
+          }
+          cleanNote = buffer.toString().trim();
+        } catch (_) {
+          cleanNote = _noteJson;
+        }
+      }
+
+      final generatedSubtasks = await AiService.generateSubtasks(
+        title: title.text,
+        taskType: taskType.text,
+        note: cleanNote,
+      );
       if (generatedSubtasks.isNotEmpty) {
         setState(() {
           for (final subtaskTitle in generatedSubtasks) {
@@ -372,9 +408,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                 child: Row(
                   children: _priorities.map((p) {
                     final bool isSelected = _selectedPriority == p;
-                    final Color chipColor = p == 'none'
-                        ? context.secondaryFontColor
-                        : getPriorityColor(p);
+                    final Color chipColor = getPriorityColor(context, p);
                     return Expanded(
                       child: GestureDetector(
                         onTap: () => setState(() => _selectedPriority = p),
@@ -527,19 +561,15 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                   else
                     TextButton.icon(
                       onPressed: _generateSubtasks,
-                      icon: const Icon(Icons.auto_awesome, size: 18),
-                      label: Text("AI",
-                          style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.bold)),
-                      style: TextButton.styleFrom(
-                          foregroundColor: Colors.amber.shade600),
+                      icon: HugeIcon(icon: HugeIcons.strokeRoundedAiMagic, size: 18, color: Colors.amber.shade600),
+                      label: Text("AI", style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500)),
+                      style: TextButton.styleFrom(foregroundColor: Colors.amber.shade600),
                     ),
                   TextButton.icon(
                     onPressed: _addSubtaskField,
-                    icon: const Icon(HugeIcons.strokeRoundedAdd01, size: 18),
-                    label: Text("Add",
-                        style: GoogleFonts.poppins(fontSize: 13)),
-                    style: TextButton.styleFrom(
-                        foregroundColor: AppColors.primaryColor),
+                    icon: const HugeIcon(icon: HugeIcons.strokeRoundedAdd01, size: 18, color: AppColors.primaryColor),
+                    label: Text("Add", style: GoogleFonts.poppins(fontSize: 13)),
+                    style: TextButton.styleFrom(foregroundColor: AppColors.primaryColor),
                   ),
                 ],
               ),
@@ -664,7 +694,6 @@ class _CreateTaskViewState extends State<CreateTaskView> {
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
-                height: 50,
                 child: ElevatedButton(
                   onPressed: _submitTask,
                   child: Text(_isEditing ? "Save Changes" : "Create Task"),

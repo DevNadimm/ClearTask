@@ -28,7 +28,7 @@ class TaskCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskTypeColor = getTaskTypeColor(task.taskType);
-    final priorityColor = getPriorityColor(task.priority);
+    final priorityColor = getPriorityColor(context, task.priority);
     final hasPriority = task.priority != 'none';
     final hasSubtasks = task.subtasks.isNotEmpty;
     final completedCount = task.subtasks.where((s) => s.isCompleted).length;
@@ -96,17 +96,15 @@ class TaskCardWidget extends StatelessWidget {
                             Expanded(
                               child: Row(
                                 children: [
-                                  if (hasPriority) ...[
-                                    Container(
-                                      width: 8,
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        color: priorityColor,
-                                        shape: BoxShape.circle,
-                                      ),
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: priorityColor,
+                                      shape: BoxShape.circle,
                                     ),
-                                    const SizedBox(width: 6),
-                                  ],
+                                  ),
+                                  const SizedBox(width: 6),
                                   Expanded(
                                     child: Text(
                                       task.title,
@@ -379,13 +377,10 @@ class TaskCardWidget extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Row(
                                     children: [
-                                      Container(
-                                        width: 10,
-                                        height: 10,
-                                        decoration: BoxDecoration(
-                                          color: priorityColor,
-                                          shape: BoxShape.circle,
-                                        ),
+                                      Icon(
+                                        Icons.circle,
+                                        size: 18,
+                                        color: priorityColor,
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
@@ -521,7 +516,7 @@ class _SubtaskRow extends StatelessWidget {
                   decorationColor: context.secondaryFontColor,
                 ),
                 overflow: TextOverflow.ellipsis,
-                maxLines: 2,
+                maxLines: 10,
               ),
             ),
           ),

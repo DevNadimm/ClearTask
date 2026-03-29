@@ -22,6 +22,21 @@ class ContactService {
     }
   }
 
+  static Future<void> requestFeature() async {
+    final String subject = Uri.encodeComponent('Feature Request: ClearTask App');
+    final Uri emailLaunchUri = Uri.parse('mailto:$developerEmail?subject=$subject');
+
+    try {
+      if (await canLaunchUrl(emailLaunchUri)) {
+        await launchUrl(emailLaunchUri, mode: LaunchMode.externalApplication);
+      } else {
+        await launchUrl(emailLaunchUri, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      debugPrint('Error launching feature request email: $e');
+    }
+  }
+
   static Future<void> openUrl(String url) async {
     final Uri uri = Uri.parse(url);
     try {

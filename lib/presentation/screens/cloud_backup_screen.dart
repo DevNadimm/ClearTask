@@ -1,5 +1,4 @@
 import 'package:clear_task/core/constants/colors.dart';
-import 'package:clear_task/core/utils/formatter/date_formatter.dart';
 import 'package:clear_task/presentation/blocs/auth/auth_cubit.dart';
 import 'package:clear_task/presentation/blocs/sync/sync_cubit.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
@@ -12,7 +11,6 @@ import 'package:hugeicons/hugeicons.dart';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
-
 import 'package:intl/intl.dart';
 
 class CloudBackupScreen extends StatefulWidget {
@@ -23,15 +21,15 @@ class CloudBackupScreen extends StatefulWidget {
 }
 
 class _CloudBackupScreenState extends State<CloudBackupScreen> {
-
   String _formatDateTime(DateTime dateTime) {
     final now = DateTime.now();
     final isToday = DateFormat('yyyyMMdd').format(dateTime) ==
         DateFormat('yyyyMMdd').format(now);
 
     return isToday
-        ? DateFormat('h:mm a').format(dateTime)        // "2:05 PM"
-        : DateFormat('MMM d, y h:mm a').format(dateTime); // "Jan 15, 2025 2:05 PM"
+        ? DateFormat('h:mm a').format(dateTime) // "2:05 PM"
+        : DateFormat('MMM d, y h:mm a')
+            .format(dateTime); // "Jan 15, 2025 2:05 PM"
   }
 
   @override
@@ -71,7 +69,8 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
               }
             });
           }
-          if (authState.status == AuthStatus.error && authState.errorMessage != null) {
+          if (authState.status == AuthStatus.error &&
+              authState.errorMessage != null) {
             _showErrorSnackBar(authState.errorMessage!);
           }
         },
@@ -86,21 +85,6 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
                 : _buildLoginView(context),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildBlob(Color color, double size) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
-        child: Container(color: Colors.transparent),
       ),
     );
   }
@@ -144,12 +128,15 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
                             ? CachedNetworkImage(
                                 imageUrl: user.photoURL!,
                                 fit: BoxFit.cover,
-                                placeholder: (context, url) => Shimmer.fromColors(
-                                  baseColor: context.inputBorderColor.withValues(alpha: 0.2),
+                                placeholder: (context, url) =>
+                                    Shimmer.fromColors(
+                                  baseColor: context.inputBorderColor
+                                      .withValues(alpha: 0.2),
                                   highlightColor: context.cardColor,
                                   child: Container(color: Colors.white),
                                 ),
-                                errorWidget: (context, url, error) => const Icon(
+                                errorWidget: (context, url, error) =>
+                                    const Icon(
                                   Icons.person_rounded,
                                   size: 40,
                                   color: AppColors.primaryColor,
@@ -237,7 +224,9 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
                     const SizedBox(height: 20),
                     _buildActionButton(
                       context: context,
-                      label: status == SyncStatus.syncing ? 'Syncing...' : 'Force Sync',
+                      label: status == SyncStatus.syncing
+                          ? 'Syncing...'
+                          : 'Force Sync',
                       icon: HugeIcons.strokeRoundedRefresh,
                       isLoading: status == SyncStatus.syncing,
                       onPressed: () {
@@ -437,12 +426,9 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
   }) {
     return SizedBox(
       width: double.infinity,
-      height: 52,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
-        child: Text(
-          label,
-        ),
+        child: Text(label),
       ),
     );
   }

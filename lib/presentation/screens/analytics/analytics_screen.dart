@@ -75,6 +75,8 @@ class AnalyticsScreen extends StatelessWidget {
     );
   }
 
+
+
   Widget _buildSummaryRow(BuildContext context, int completed, int pending, double rate) {
     return Row(
       children: [
@@ -266,7 +268,7 @@ class AnalyticsScreen extends StatelessWidget {
       sections.add(
         PieChartSectionData(
           value: count.toDouble(),
-          title: '', // Title hidden to make it cleaner
+          title: '',
           radius: 20,
           color: palette[i % palette.length],
           showTitle: false,

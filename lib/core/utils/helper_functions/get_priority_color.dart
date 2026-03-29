@@ -1,6 +1,7 @@
+import 'package:clear_task/core/constants/colors.dart';
 import 'package:flutter/material.dart';
 
-Color getPriorityColor(String priority) {
+Color getPriorityColor(BuildContext context, String priority) {
   switch (priority.toLowerCase()) {
     case 'high':
       return const Color(0xFFEF5350); // Red
@@ -9,7 +10,7 @@ Color getPriorityColor(String priority) {
     case 'low':
       return const Color(0xFF42A5F5); // Blue
     default:
-      return Colors.transparent;
+      return context.secondaryFontColor;
   }
 }
 

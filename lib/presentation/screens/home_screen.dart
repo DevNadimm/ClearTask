@@ -1,7 +1,7 @@
 import 'package:clear_task/core/constants/colors.dart';
-import 'package:clear_task/core/utils/helper_functions/ad_helper.dart';
 import 'package:clear_task/core/utils/helper_functions/get_filtered_tasks.dart';
 import 'package:clear_task/core/utils/widgets/custom_divider.dart';
+
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
 import 'package:clear_task/presentation/blocs/task/task_state.dart';
@@ -10,6 +10,7 @@ import 'package:clear_task/presentation/screens/celebrate_success_screen.dart';
 import 'package:clear_task/presentation/screens/create_task/create_task_screen.dart';
 import 'package:clear_task/presentation/screens/search_task_screen.dart';
 import 'package:clear_task/presentation/screens/analytics/analytics_screen.dart';
+import 'package:clear_task/presentation/screens/plan_my_day_screen.dart';
 import 'package:clear_task/presentation/screens/pomodoro/pomodoro_screen.dart';
 import 'package:clear_task/presentation/screens/cloud_backup_screen.dart';
 import 'package:clear_task/presentation/screens/developer_info_screen.dart';
@@ -19,7 +20,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -30,40 +30,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  BannerAd? _bannerAd;
-  bool _isAdLoaded = false;
-
-  void _loadBannerAd() {
-    // Dispose old ad first
-    _bannerAd?.dispose();
-    _bannerAd = null;
-
-    setState(() {
-      _isAdLoaded = false;
-    });
-
-    final ad = BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          if (!mounted) return;
-          setState(() {
-            _bannerAd = ad as BannerAd;
-            _isAdLoaded = true;
-// 👈 new key = new AdWidget instance
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-        },
-      ),
-    );
-
-    ad.load();
-  }
-
   late final TabController _tabController;
   final List<String> _tabTitles = [
     "All",
@@ -87,14 +53,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     if (currentState is! TasksLoaded) {
       context.read<TaskBloc>().add(FetchTasks());
     }
-
-    _loadBannerAd();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
-    _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -198,6 +161,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ),
             ),
+
+
+
+            // ── Plan My Day AI ───────────────────────────────────────
+            ListTile(
+              leading: const Icon(HugeIcons.strokeRoundedAiBrain01, color: AppColors.primaryColor),
+              title: Text('Plan My Day', style: GoogleFonts.poppins(color: context.primaryFontColor)),
+              trailing: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text('AI',
+                    style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryColor)),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Get.to(() => const PlanMyDayScreen());
+              },
+            ),
             ListTile(
               leading: const Icon(HugeIcons.strokeRoundedAnalytics01, color: AppColors.primaryColor),
               title: Text('Analytics', style: GoogleFonts.poppins(color: context.primaryFontColor)),
@@ -238,6 +225,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ContactService.reportBug();
               },
             ),
+            ListTile(
+              leading: const Icon(HugeIcons.strokeRoundedAiMagic, color: AppColors.primaryColor),
+              title: Text('Request Feature', style: GoogleFonts.poppins(color: context.primaryFontColor)),
+              onTap: () {
+                Navigator.pop(context);
+                ContactService.requestFeature();
+              },
+            ),
             const CustomDivider(),
             BlocBuilder<ThemeCubit, ThemeMode>(
               builder: (context, mode) {
@@ -273,17 +268,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           if (state is CelebrateSuccess) {
             Get.to(() => const CelebrateSuccessScreen());
           }
-          // 👇 Reload ad whenever task list changes to avoid stale AdWidget
-          if (state is TaskDeleted || state is AllTasksDeleted) {
-            _loadBannerAd();
-          }
         },
         builder: (context, state) {
           if (state is TaskLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // In BlocConsumer builder, TasksLoaded section:
           if (state is TasksLoaded) {
             return TabBarView(
               controller: _tabController,
@@ -295,7 +285,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   onToggleChange: (task) {
                     context.read<TaskBloc>().add(ToggleTaskCompletion(task: task));
                   },
-                  bannerAd: (_isAdLoaded && title == 'All') ? _bannerAd : null, // no adKey
                 );
               }).toList(),
             );

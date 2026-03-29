@@ -7,14 +7,12 @@ import 'package:clear_task/presentation/widgets/sort_filter_bar.dart';
 import 'package:clear_task/presentation/widgets/task_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class TaskListWidget extends StatefulWidget {
   final String tab;
   final List<Task> tasks;
   final Function(Task task) onToggleChange;
-  final BannerAd? bannerAd;
   final bool showTabEmptyMessage;
   final bool isInSearchMode;
 
@@ -23,7 +21,6 @@ class TaskListWidget extends StatefulWidget {
     this.tab = "All",
     required this.tasks,
     required this.onToggleChange,
-    this.bannerAd,
     this.showTabEmptyMessage = true,
     this.isInSearchMode = false,
   });
@@ -33,26 +30,9 @@ class TaskListWidget extends StatefulWidget {
 }
 
 class _TaskListWidgetState extends State<TaskListWidget> {
-  // Keep a stable widget instance — never rebuild unless ad object changes
-  Widget? _adWidget;
-  BannerAd? _lastAd;
-
   // Sort & filter state
   SortOption _selectedSort = SortOption.defaultSort;
   bool _uncompletedFirst = false;
-
-  Widget _getAdWidget(BannerAd ad) {
-    if (_lastAd != ad || _adWidget == null) {
-      _lastAd = ad;
-      _adWidget = SizedBox(
-        key: UniqueKey(),
-        width: ad.size.width.toDouble(),
-        height: ad.size.height.toDouble(),
-        child: AdWidget(ad: ad),
-      );
-    }
-    return _adWidget!;
-  }
 
   final String searchNotFoundMessage = "No tasks found!\nPlease try a different keyword.";
   final String noTasksMessage = "No tasks yet!\nStart by creating a new one.";
@@ -147,10 +127,6 @@ class _TaskListWidgetState extends State<TaskListWidget> {
     }
 
     final sortedTasks = _applySortAndFilter(widget.tasks);
-    final bool showAd = widget.bannerAd != null &&
-        widget.tab == 'All' &&
-        sortedTasks.length >= 3;
-    final int taskLength = sortedTasks.length + (showAd ? 1 : 0);
 
     return Column(
       children: [
@@ -215,15 +191,8 @@ class _TaskListWidgetState extends State<TaskListWidget> {
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(vertical: 4),
-            itemCount: taskLength,
+            itemCount: sortedTasks.length,
             itemBuilder: (context, index) {
-              if (showAd && index == taskLength - 1) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: _getAdWidget(widget.bannerAd!),
-                );
-              }
-
               final task = sortedTasks[index];
               return TaskCardWidget(
                 task: task,

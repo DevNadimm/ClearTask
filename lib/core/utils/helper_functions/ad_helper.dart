@@ -1,11 +1,11 @@
 class AdHelper {
   static const bool isTest = true;
 
-  static String get bannerAdUnitId {
+  static String get rewardedAdUnitId {
     if (isTest) {
-      return "ca-app-pub-3940256099942544/6300978111";
+      return "ca-app-pub-3940256099942544/5224354917";
     } else {
-      return "ca-app-pub-9221751274718386/1539621680";
+      return "ca-app-pub-9221751274718386/7787113026";
     }
   }
 

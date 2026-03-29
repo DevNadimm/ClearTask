@@ -1,5 +1,6 @@
 import 'package:clear_task/core/utils/theme/theme.dart';
 import 'package:clear_task/presentation/blocs/auth/auth_cubit.dart';
+import 'package:clear_task/presentation/blocs/premium/premium_cubit.dart';
 import 'package:clear_task/presentation/blocs/sync/sync_cubit.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => ThemeCubit()),
         BlocProvider(create: (_) => AuthCubit()),
         BlocProvider(create: (_) => SyncCubit()),
+        BlocProvider(create: (_) => PremiumCubit()),
       ],
       child: Builder(
         builder: (ctx) {

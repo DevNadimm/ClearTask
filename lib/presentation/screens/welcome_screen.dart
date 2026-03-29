@@ -152,7 +152,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget _buildNextButton() {
     return SizedBox(
       width: double.infinity,
-      height: 54,
       child: ElevatedButton(
         onPressed: () {
           _pageController.nextPage(
@@ -170,7 +169,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       children: [
         SizedBox(
           width: double.infinity,
-          height: 54,
           child: ElevatedButton(
             onPressed: () => context.read<AuthCubit>().signInWithGoogle(),
             style: ElevatedButton.styleFrom(
