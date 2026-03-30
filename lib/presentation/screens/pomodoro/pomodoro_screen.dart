@@ -77,7 +77,11 @@ class _PomodoroBodyState extends State<_PomodoroBody>
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: const Icon(HugeIcons.strokeRoundedArrowLeft01, size: 34),
+          icon: Icon(
+            HugeIcons.strokeRoundedArrowLeft01,
+            size: 30,
+            color: context.primaryFontColor,
+          ),
         ),
         title: const Text('Focus Timer'),
         actions: [
@@ -89,7 +93,10 @@ class _PomodoroBodyState extends State<_PomodoroBody>
               return IconButton(
                 tooltip: 'Settings',
                 onPressed: () => _showSettingsSheet(context),
-                icon: const Icon(HugeIcons.strokeRoundedSettings01),
+                icon: Icon(
+                  HugeIcons.strokeRoundedSettings01,
+                  color: context.primaryFontColor,
+                ),
               );
             },
           ),
@@ -121,7 +128,8 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                       key: ValueKey(state.phaseLabel),
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(state.phaseEmoji, style: const TextStyle(fontSize: 28)),
+                        Text(state.phaseEmoji,
+                            style: const TextStyle(fontSize: 28)),
                         const SizedBox(width: 8),
                         Text(
                           state.phaseLabel,
@@ -169,7 +177,8 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                             child: CircularProgressIndicator(
                               value: 1.0,
                               strokeWidth: 4,
-                              color: context.inputBorderColor.withValues(alpha: 0.12),
+                              color: context.inputBorderColor
+                                  .withValues(alpha: 0.12),
                               strokeCap: StrokeCap.round,
                             ),
                           ),
@@ -178,7 +187,8 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                             width: 260,
                             height: 260,
                             child: TweenAnimationBuilder<double>(
-                              tween: Tween(begin: state.progress, end: state.progress),
+                              tween: Tween(
+                                  begin: state.progress, end: state.progress),
                               duration: const Duration(milliseconds: 200),
                               builder: (context, value, _) {
                                 return Transform.rotate(
@@ -188,7 +198,8 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                                       progress: value,
                                       color: color,
                                       strokeWidth: 12,
-                                      bgColor: context.inputBorderColor.withValues(alpha: 0.15),
+                                      bgColor: context.inputBorderColor
+                                          .withValues(alpha: 0.15),
                                     ),
                                   ),
                                 );
@@ -203,7 +214,8 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                               shape: BoxShape.circle,
                               color: context.cardColor.withValues(alpha: 0.7),
                               border: Border.all(
-                                color: context.inputBorderColor.withValues(alpha: 0.1),
+                                color: context.inputBorderColor
+                                    .withValues(alpha: 0.1),
                                 width: 1,
                               ),
                             ),
@@ -232,9 +244,11 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                                   TextButton(
                                     onPressed: () => cubit.skipToNext(),
                                     style: TextButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 4),
                                       minimumSize: Size.zero,
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -283,7 +297,8 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                       // Play / Pause
                       GestureDetector(
                         onTap: () {
-                          if (state.phase == PomodoroPhase.idle || state.isPaused) {
+                          if (state.phase == PomodoroPhase.idle ||
+                              state.isPaused) {
                             cubit.start();
                           } else {
                             cubit.pause();
@@ -330,9 +345,9 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                     decoration: BoxDecoration(
                       color: context.cardColor,
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: context.inputBorderColor.withValues(alpha: 0.2),
+                        color: context.inputBorderColor,
                       ),
                     ),
                     child: Column(
@@ -345,7 +360,7 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                             color: context.secondaryFontColor,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        if (state.completedPomodoros.clamp(0, 12) > 0) const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(
@@ -365,28 +380,31 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                                     ),
                                   ],
                                 ),
-                                child: const Icon(Icons.check, size: 10, color: Colors.white),
+                                child: const Icon(Icons.check,
+                                    size: 10, color: Colors.white),
                               ),
                             ),
                           )..addAll(
-                            List.generate(
-                              (4 - (state.completedPomodoros % 4)) % 4,
-                              (i) => Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 3),
-                                child: Container(
-                                  width: 14,
-                                  height: 14,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: context.inputBorderColor.withValues(alpha: 0.4),
-                                      width: 1.5,
+                              List.generate(
+                                (4 - (state.completedPomodoros % 4)) % 4,
+                                (i) => Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 3),
+                                  child: Container(
+                                    width: 14,
+                                    height: 14,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: context.inputBorderColor
+                                            .withValues(alpha: 0.4),
+                                        width: 1.5,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
                         ),
                         if (state.completedPomodoros > 0)
                           Padding(
@@ -411,9 +429,10 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: context.cardColor,
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: context.inputBorderColor.withValues(alpha: 0.2),
+                          color: context.inputBorderColor,
+                          width: 1,
                         ),
                       ),
                       child: Column(
@@ -433,19 +452,24 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                               final isSelected = state.focusMinutes == min;
                               return Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 3),
                                   child: GestureDetector(
                                     onTap: () => cubit.setFocusMinutes(min),
                                     child: AnimatedContainer(
-                                      duration: const Duration(milliseconds: 200),
-                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
                                       decoration: BoxDecoration(
                                         color: isSelected
                                             ? color.withValues(alpha: 0.2)
-                                            : context.inputBorderColor.withValues(alpha: 0.12),
+                                            : context.inputBorderColor
+                                                .withValues(alpha: 0.12),
                                         borderRadius: BorderRadius.circular(12),
                                         border: isSelected
-                                            ? Border.all(color: color, width: 1.5)
+                                            ? Border.all(
+                                                color: color, width: 1.5)
                                             : null,
                                       ),
                                       child: Center(
@@ -512,6 +536,7 @@ class _PomodoroBodyState extends State<_PomodoroBody>
 
 class _PhaseChips extends StatelessWidget {
   final PomodoroPhase currentPhase;
+
   const _PhaseChips({required this.currentPhase});
 
   @override
@@ -538,9 +563,8 @@ class _PhaseChips extends StatelessWidget {
                     ? item.$3.withValues(alpha: 0.2)
                     : context.inputBorderColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
-                border: isActive
-                    ? Border.all(color: item.$3, width: 1.2)
-                    : null,
+                border:
+                    isActive ? Border.all(color: item.$3, width: 1.2) : null,
               ),
               child: Text(
                 item.$1,

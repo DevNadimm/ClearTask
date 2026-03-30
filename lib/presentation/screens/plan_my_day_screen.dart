@@ -20,8 +20,7 @@ class PlanMyDayScreen extends StatefulWidget {
   State<PlanMyDayScreen> createState() => _PlanMyDayScreenState();
 }
 
-class _PlanMyDayScreenState extends State<PlanMyDayScreen>
-    with SingleTickerProviderStateMixin {
+class _PlanMyDayScreenState extends State<PlanMyDayScreen> with SingleTickerProviderStateMixin {
   final Set<int> _selectedTaskIds = {};
   DayPlan? _dayPlan;
   bool _isLoading = false;
@@ -136,22 +135,13 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen>
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: const Icon(HugeIcons.strokeRoundedArrowLeft01, size: 28),
+          icon: Icon(
+            HugeIcons.strokeRoundedArrowLeft01,
+            size: 30,
+            color: context.primaryFontColor,
+          ),
         ),
-        title: Row(
-          children: [
-            const Icon(HugeIcons.strokeRoundedAiBrain01,
-                color: AppColors.primaryColor, size: 26),
-            const SizedBox(width: 10),
-            Text(
-              'Plan My Day',
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
+        title: const Text('Plan My Day'),
         actions: [
           // Usage counter badge
           BlocBuilder<PremiumCubit, PremiumState>(
@@ -309,7 +299,8 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen>
                         color: AppColors.error.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                            color: AppColors.error.withValues(alpha: 0.3)),
+                            color: AppColors.error.withValues(alpha: 0.3),
+                            width: 1),
                       ),
                       child: Row(
                         children: [
@@ -375,8 +366,8 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen>
             border: Border.all(
               color: isSelected
                   ? AppColors.primaryColor
-                  : context.inputBorderColor.withValues(alpha: 0.3),
-              width: isSelected ? 1.5 : 1,
+                  : context.inputBorderColor,
+              width: isSelected ? 1.2 : 1,
             ),
           ),
           child: Row(
@@ -423,7 +414,8 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen>
                                   size: 12, color: context.secondaryFontColor),
                               const SizedBox(width: 4),
                               Text(
-                                DateFormatter.toLongMonthDayYear(task.dueDate.toString()),
+                                DateFormatter.toLongMonthDayYear(
+                                    task.dueDate.toString()),
                                 style: GoogleFonts.poppins(
                                   fontSize: 11,
                                   color: context.secondaryFontColor,
@@ -550,9 +542,10 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: AppColors.primaryColor.withValues(alpha: 0.2),
+              color: AppColors.primaryColor.withValues(alpha: 0.5),
+              width: 1,
             ),
           ),
           child: Column(
@@ -639,8 +632,19 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen>
               if (index < _dayPlan!.tasks.length - 1)
                 Container(
                   width: 2,
-                  height: 80,
-                  color: priorityColor.withValues(alpha: 0.2),
+                  height: 100,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        priorityColor.withValues(alpha: 0.8),
+                        priorityColor.withValues(alpha: 0.5),
+                        priorityColor.withValues(alpha: 0.2),
+                        priorityColor.withValues(alpha: 0),
+                      ],
+                    ),
+                  ),
                 ),
             ],
           ),
@@ -654,7 +658,8 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen>
                 color: context.cardColor,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: priorityColor.withValues(alpha: 0.2),
+                  color: priorityColor.withValues(alpha: 0.5),
+                  width: 1,
                 ),
               ),
               child: Column(
@@ -705,37 +710,39 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen>
                   // Steps
                   if (task.steps.isNotEmpty) ...[
                     const SizedBox(height: 12),
-                    ...task.steps.map((step) => Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Container(
-                                  width: 6,
-                                  height: 6,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryColor
-                                        .withValues(alpha: 0.5),
-                                    shape: BoxShape.circle,
-                                  ),
+                    ...task.steps.map(
+                      (step) => Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Container(
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor
+                                      .withValues(alpha: 0.5),
+                                  shape: BoxShape.circle,
                                 ),
                               ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  step,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 13,
-                                    color: context.secondaryFontColor,
-                                    height: 1.4,
-                                  ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                step,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  color: context.secondaryFontColor,
+                                  height: 1.4,
                                 ),
                               ),
-                            ],
-                          ),
-                        )),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ],
               ),

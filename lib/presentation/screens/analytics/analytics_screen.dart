@@ -18,13 +18,15 @@ class AnalyticsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Productivity Analytics',
+          'Productivity Analytics'
         ),
         leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: const Icon(HugeIcons.strokeRoundedArrowLeft01, size: 34),
+          onPressed: () => Get.back(),
+          icon: Icon(
+            HugeIcons.strokeRoundedArrowLeft01,
+            size: 30,
+            color: context.primaryFontColor,
+          ),
         ),
       ),
       body: BlocBuilder<TaskBloc, TaskState>(
@@ -80,9 +82,9 @@ class AnalyticsScreen extends StatelessWidget {
   Widget _buildSummaryRow(BuildContext context, int completed, int pending, double rate) {
     return Row(
       children: [
-        Expanded(child: _buildSummaryCard(context, 'Done', completed.toString(), HugeIcons.strokeRoundedTickDouble02, Colors.greenAccent)),
+        Expanded(child: _buildSummaryCard(context, 'Done', completed.toString(), HugeIcons.strokeRoundedTickDouble02, Colors.green)),
         const SizedBox(width: 12),
-        Expanded(child: _buildSummaryCard(context, 'Pending', pending.toString(), HugeIcons.strokeRoundedLoading03, Colors.orangeAccent)),
+        Expanded(child: _buildSummaryCard(context, 'Pending', pending.toString(), HugeIcons.strokeRoundedLoading03, Colors.orange)),
         const SizedBox(width: 12),
         Expanded(child: _buildSummaryCard(context, 'Score', '${rate.toStringAsFixed(0)}%', HugeIcons.strokeRoundedRocket01, AppColors.primaryColor)),
       ],
@@ -94,15 +96,8 @@ class AnalyticsScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: context.cardColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(width: 1, color: context.inputBorderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,10 +178,11 @@ class AnalyticsScreen extends StatelessWidget {
 
     return Container(
       height: 250,
-      padding: const EdgeInsets.only(top: 24, bottom: 12, left: 8, right: 16),
+      padding: const EdgeInsets.only(top: 24, bottom: 12, left: 8, right: 8),
       decoration: BoxDecoration(
         color: context.cardColor,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(width: 1, color: context.inputBorderColor),
       ),
       child: BarChart(
         BarChartData(
@@ -236,7 +232,8 @@ class AnalyticsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
           color: context.cardColor,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(width: 1, color: context.inputBorderColor),
         ),
         child: Center(
           child: Text(
@@ -281,7 +278,8 @@ class AnalyticsScreen extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: context.cardColor,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(width: 1, color: context.inputBorderColor),
       ),
       child: Row(
         children: [

@@ -15,7 +15,11 @@ class DeveloperInfoScreen extends StatelessWidget {
         title: const Text('Developer Info'),
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: const Icon(HugeIcons.strokeRoundedArrowLeft01, size: 34),
+          icon: Icon(
+            HugeIcons.strokeRoundedArrowLeft01,
+            size: 30,
+            color: context.primaryFontColor,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -24,43 +28,60 @@ class DeveloperInfoScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 20),
             // Profile Section
-            Center(
-              child: CircleAvatar(
-                backgroundColor: AppColors.primaryColor,
-                radius: 62,
-                child: CircleAvatar(
-                  backgroundColor: context.cardColor,
-                  radius: 60,
-                  child: ClipRRect(borderRadius: BorderRadius.circular(100), child: Image.asset('assets/images/nadim-corporate.png')),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.primaryColor.withValues(alpha: 0.5),
+                      width: 2,
+                    ),
+                  ),
                 ),
-              ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  child: CircleAvatar(
+                    backgroundColor: context.cardColor,
+                    radius: 45,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: Image.asset('assets/images/nadim-corporate.png'),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             Text(
               'Nadim Chowdhury',
               style: GoogleFonts.poppins(
-                fontSize: 26,
+                fontSize: 22,
                 fontWeight: FontWeight.w700,
                 color: context.primaryFontColor,
               ),
             ),
+            const SizedBox(height: 4),
             Text(
               'Full-Stack Flutter Developer',
               style: GoogleFonts.poppins(
-                fontSize: 16,
-                color: AppColors.primaryColor,
-                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: context.secondaryFontColor,
+                fontWeight: FontWeight.w400,
               ),
             ),
             const SizedBox(height: 32),
-            
+
             // About Section
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: context.cardColor,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: context.inputBorderColor.withValues(alpha: 0.5)),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: context.inputBorderColor, width: 1),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +128,7 @@ class DeveloperInfoScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 40),
-            
+
             Text(
               '© 2026 ClearTask - Built with ❤️',
               style: GoogleFonts.poppins(
@@ -134,8 +155,8 @@ class DeveloperInfoScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
           color: context.cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.primaryColor.withValues(alpha: 0.3)),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: context.inputBorderColor, width: 1),
         ),
         child: Row(
           children: [

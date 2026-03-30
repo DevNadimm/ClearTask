@@ -37,24 +37,34 @@ class MyApp extends StatelessWidget {
             taskBloc.add(FetchTasks());
           };
 
-          return BlocBuilder<ThemeCubit, ThemeMode>(
-            builder: (context, themeMode) {
-              return GetMaterialApp(
-                title: 'ClearTask',
-                theme: lightTheme,
-                darkTheme: darkTheme,
-                themeMode: themeMode,
-                debugShowCheckedModeBanner: false,
-                localizationsDelegates: const [
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  FlutterQuillLocalizations.delegate,
-                ],
-                supportedLocales: const [Locale('en')],
-                home: const SplashScreen(),
-              );
+          return BlocListener<AuthCubit, AuthState>(
+            listener: (context, authState) {
+              if (authState.status == AuthStatus.authenticated) {
+                final userId = authState.user!.uid;
+                context.read<SyncCubit>().sync(userId);
+              } else if (authState.status == AuthStatus.unauthenticated) {
+                context.read<SyncCubit>().clearUser();
+              }
             },
+            child: BlocBuilder<ThemeCubit, ThemeMode>(
+              builder: (context, themeMode) {
+                return GetMaterialApp(
+                  title: 'ClearTask',
+                  theme: lightTheme,
+                  darkTheme: darkTheme,
+                  themeMode: themeMode,
+                  debugShowCheckedModeBanner: false,
+                  localizationsDelegates: const [
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    FlutterQuillLocalizations.delegate,
+                  ],
+                  supportedLocales: const [Locale('en')],
+                  home: const SplashScreen(),
+                );
+              },
+            ),
           );
         },
       ),

@@ -25,11 +25,17 @@ class SyncService {
       final isDeleted = (map['isDeleted'] as int?) == 1;
 
       try {
-        if (isDeleted && cloudId != null) {
-          debugPrint('  ☁️ Deleting cloud task: $cloudId (localId: $localId)');
-          await collection.doc(cloudId).delete();
-          await _dbHelper.markSynced(localId, cloudId);
-          debugPrint('  ☁️ Deleted cloud task successfully: $cloudId');
+        if (isDeleted) {
+          if (cloudId != null) {
+            debugPrint('  ☁️ Deleting cloud task: $cloudId (localId: $localId)');
+            await collection.doc(cloudId).delete();
+            await _dbHelper.markSynced(localId, cloudId);
+            debugPrint('  ☁️ Deleted cloud task successfully: $cloudId');
+          } else {
+            // Task was deleted locally before it was ever synced
+            debugPrint('  ☁️ Purging local-only deleted task: localId: $localId');
+            await _dbHelper.markSynced(localId, "purged"); 
+          }
         } else if (cloudId != null) {
           debugPrint('  ☁️ Updating cloud task: $cloudId (localId: $localId)');
           final subtaskMaps = await db.query(
@@ -42,7 +48,7 @@ class SyncService {
               .set(_toFirestoreMap(map, subtaskMaps));
           await _dbHelper.markSynced(localId, cloudId);
           debugPrint('  ☁️ Updated cloud task successfully: $cloudId');
-        } else if (!isDeleted) {
+        } else {
           debugPrint('  ☁️ Creating NEW cloud task for localId: $localId');
           final subtaskMaps = await db.query(
             'tbl_subtask',

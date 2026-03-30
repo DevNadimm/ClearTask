@@ -66,13 +66,10 @@ class SyncCubit extends Cubit<SyncState> {
   }
 
   Future<void> sync(String userId) async {
-    if (state.status == SyncStatus.syncing) {
-      debugPrint('⚠️ Sync skipped: already syncing');
-      return;
-    }
-    emit(state.copyWith(status: SyncStatus.syncing));
-    
     _userId = userId;
+    if (state.status == SyncStatus.syncing) return;
+    
+    emit(state.copyWith(status: SyncStatus.syncing));
     try {
       await _syncService.fullSync(userId);
       emit(state.copyWith(status: SyncStatus.synced, lastSynced: DateTime.now()));

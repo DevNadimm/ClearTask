@@ -340,10 +340,12 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: const Icon(HugeIcons.strokeRoundedArrowLeft01, size: 34),
+          onPressed: () => Get.back(),
+          icon: Icon(
+            HugeIcons.strokeRoundedArrowLeft01,
+            size: 30,
+            color: context.primaryFontColor,
+          ),
         ),
         title: Text(_isEditing ? "Edit Task" : "Create Task"),
       ),

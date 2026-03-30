@@ -48,7 +48,7 @@ class TaskCardWidget extends StatelessWidget {
           ),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        elevation: 2,
+        elevation: 0,
         color: context.cardColor,
         child: Padding(
           padding: const EdgeInsets.all(14),

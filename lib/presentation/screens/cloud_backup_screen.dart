@@ -37,8 +37,6 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
         leading: IconButton(
           onPressed: () => Get.back(),
           icon: Icon(
@@ -47,28 +45,12 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
             color: context.primaryFontColor,
           ),
         ),
-        title: Text(
-          'Cloud Backup',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
-            color: context.primaryFontColor,
-          ),
+        title: const Text(
+          'Cloud Backup'
         ),
       ),
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, authState) {
-          if (authState.status == AuthStatus.authenticated) {
-            final userId = authState.user!.uid;
-            context.read<SyncCubit>().setUser(userId);
-            context.read<SyncCubit>().sync(userId);
-
-            Future.delayed(const Duration(seconds: 2), () {
-              if (mounted) {
-                context.read<TaskBloc>().add(FetchTasks());
-              }
-            });
-          }
           if (authState.status == AuthStatus.error &&
               authState.errorMessage != null) {
             _showErrorSnackBar(authState.errorMessage!);
@@ -108,12 +90,12 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
                   alignment: Alignment.center,
                   children: [
                     Container(
-                      width: 95,
-                      height: 95,
+                      width: 90,
+                      height: 90,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: AppColors.primaryColor.withValues(alpha: 0.3),
+                          color: AppColors.primaryColor.withValues(alpha: 0.5),
                           width: 2,
                         ),
                       ),
@@ -157,6 +139,7 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
                     color: context.primaryFontColor,
                   ),
                 ),
+                const SizedBox(height: 4),
                 Text(
                   user.email ?? '',
                   style: GoogleFonts.poppins(
@@ -165,7 +148,6 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
                     fontWeight: FontWeight.w400,
                   ),
                 ),
-                const SizedBox(height: 10),
               ],
             ),
           ),
@@ -369,18 +351,12 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
       width: double.infinity,
       padding: padding ?? const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: context.cardColor.withValues(alpha: 0.8),
-        borderRadius: BorderRadius.circular(24),
+        color: context.cardColor,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: context.inputBorderColor.withValues(alpha: 0.15),
+          color: context.inputBorderColor,
+          width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
