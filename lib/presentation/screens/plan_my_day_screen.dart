@@ -119,6 +119,21 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen> with SingleTickerProv
           _isLoading = false;
         });
       }
+    } on NoInternetException catch (e) {
+      debugPrint(e.toString());
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.message;
+          _isLoading = false;
+        });
+      }
+    } on AiServiceException catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.message;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       if (mounted) {
         setState(() {

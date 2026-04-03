@@ -238,11 +238,27 @@ class _CreateTaskViewState extends State<CreateTaskView> {
           ),
         );
       }
+    } on NoInternetException catch (e) {
+      debugPrint(e.toString());
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(e.message, style: GoogleFonts.poppins(color: Colors.white)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } on AiServiceException catch (e) {
+      debugPrint(e.toString());
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(e.message, style: GoogleFonts.poppins(color: Colors.white)),
+          backgroundColor: AppColors.error,
+        ),
+      );
     } catch (e) {
       debugPrint(e.toString());
       messenger.showSnackBar(
         SnackBar(
-          content: Text("Failed to generate subtasks: ${e.toString()}", style: GoogleFonts.poppins(color: Colors.white)),
+          content: Text("Failed to generate subtasks. Please try again.", style: GoogleFonts.poppins(color: Colors.white)),
           backgroundColor: AppColors.error,
         ),
       );

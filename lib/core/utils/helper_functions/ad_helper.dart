@@ -1,5 +1,5 @@
 class AdHelper {
-  static const bool isTest = false;
+  static const bool isTest = true;
 
   static String get rewardedAdUnitId {
     if (isTest) {
