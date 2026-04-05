@@ -14,7 +14,7 @@ class DBHelper {
 
     _db = await openDatabase(
       path,
-      version: 7,
+      version: 9,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -38,7 +38,8 @@ class DBHelper {
         cloudId TEXT,
         isSynced INTEGER DEFAULT 0,
         isDeleted INTEGER DEFAULT 0,
-        calendarEventId TEXT
+        calendarEventId TEXT,
+        isXpAwarded INTEGER DEFAULT 0
       )
     ''');
 
@@ -49,6 +50,7 @@ class DBHelper {
         title TEXT NOT NULL,
         isCompleted INTEGER NOT NULL,
         completedAt TEXT,
+        isXpAwarded INTEGER DEFAULT 0,
         FOREIGN KEY (taskId) REFERENCES tbl_task(id) ON DELETE CASCADE
       )
     ''');
@@ -96,6 +98,29 @@ class DBHelper {
     if (oldVersion < 7) {
       await db.execute('ALTER TABLE tbl_subtask ADD COLUMN completedAt TEXT');
       debugPrint('🔄 Database upgraded to v7: completedAt column added to tbl_subtask');
+    }
+
+    if (oldVersion < 8) {
+      // Version 8 added the columns separately, but we'll re-ensure they exist in v9 for everyone.
+      try {
+        await db.execute('ALTER TABLE tbl_task ADD COLUMN isXpAwarded INTEGER DEFAULT 0');
+        await db.execute('ALTER TABLE tbl_subtask ADD COLUMN isXpAwarded INTEGER DEFAULT 0');
+      } catch (e) {
+        debugPrint('ℹ️ Columns isXpAwarded already exist from v8 attempt.');
+      }
+    }
+
+    if (oldVersion < 9) {
+      // Re-running column addition with try-catch to guarantee schema integrity
+      try {
+        await db.execute('ALTER TABLE tbl_task ADD COLUMN isXpAwarded INTEGER DEFAULT 0');
+        debugPrint('🔄 tbl_task: Added isXpAwarded');
+      } catch (_) {}
+      try {
+        await db.execute('ALTER TABLE tbl_subtask ADD COLUMN isXpAwarded INTEGER DEFAULT 0');
+        debugPrint('🔄 tbl_subtask: Added isXpAwarded');
+      } catch (_) {}
+      debugPrint('🔄 Database upgraded to v9: Guaranteed isXpAwarded columns.');
     }
   }
 

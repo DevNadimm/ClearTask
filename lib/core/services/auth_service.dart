@@ -68,6 +68,9 @@ class AuthService {
           'email': user.email ?? '',
           'photoUrl': user.photoURL,
           'createdAt': FieldValue.serverTimestamp(),
+          'xp': 0,
+          'level': 1,
+          'rankTitle': 'Novice',
         });
 
         // 2. Create Credit with Signup Bonus (4)

@@ -1,5 +1,7 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/data/models/task_model.dart';
+import 'package:clear_task/data/models/user_profile_model.dart';
+import 'package:clear_task/data/repositories/user_stats_repository.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_state.dart';
 import 'package:clear_task/presentation/screens/analytics/analytics_service.dart';
@@ -11,16 +13,61 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 
-class AnalyticsScreen extends StatelessWidget {
+import 'package:clear_task/presentation/widgets/level_up_dialog.dart';
+import 'dart:async';
+
+class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
+
+  @override
+  State<AnalyticsScreen> createState() => _AnalyticsScreenState();
+}
+
+class _AnalyticsScreenState extends State<AnalyticsScreen> {
+  StreamSubscription<int>? _levelUpSubscription;
+  
+  final List<Future<dynamic> Function()> _dialogQueue = [];
+  bool _isProcessingQueue = false;
+
+  void _enqueueDialog(Future<dynamic> Function() dialogBuilder) {
+    _dialogQueue.add(dialogBuilder);
+    if (!_isProcessingQueue) {
+      _processQueue();
+    }
+  }
+
+  Future<void> _processQueue() async {
+    _isProcessingQueue = true;
+    while (_dialogQueue.isNotEmpty) {
+      if (!mounted) break;
+      final builder = _dialogQueue.removeAt(0);
+      await builder();
+    }
+    _isProcessingQueue = false;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _levelUpSubscription = UserStatsRepository().levelUpStream.listen((newLevel) {
+      _enqueueDialog(() => Get.dialog(
+        LevelUpDialog(newLevel: newLevel),
+        barrierDismissible: false,
+      ));
+    });
+  }
+
+  @override
+  void dispose() {
+    _levelUpSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Productivity Analytics'
-        ),
+        title: const Text('Productivity Analytics'),
         leading: IconButton(
           onPressed: () => Get.back(),
           icon: Icon(
@@ -37,7 +84,6 @@ class AnalyticsScreen extends StatelessWidget {
           }
 
           final tasks = state.tasks;
-          
           final completedUnits = AnalyticsService.getTrueCompletionCount(tasks);
           final pendingUnits = AnalyticsService.getTotalIncompleteUnits(tasks);
           final totalTasks = tasks.length;
@@ -45,46 +91,142 @@ class AnalyticsScreen extends StatelessWidget {
           final scoreRate = totalTasks == 0 ? 0.0 : (overallScore / totalTasks) * 100;
           final subtaskRate = AnalyticsService.getSubtaskCompletionRate(tasks);
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildSummaryRow(context, completedUnits, pendingUnits, scoreRate),
-                const SizedBox(height: 12),
-                _buildAdditionalMetricsRow(context, subtaskRate, completedUnits),
-                const SizedBox(height: 32),
-                Text(
-                  'Weekly Activity',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: context.primaryFontColor,
-                  ),
+          return StreamBuilder<UserProfileModel?>(
+            stream: UserStatsRepository().getUserProfileStream(),
+            builder: (context, snapshot) {
+              final profile = snapshot.data;
+              
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (profile != null) ...[
+                      _buildLevelProgressCard(context, profile),
+                      const SizedBox(height: 24),
+                    ],
+                    _buildSummaryRow(context, completedUnits, pendingUnits, scoreRate),
+                    const SizedBox(height: 12),
+                    _buildAdditionalMetricsRow(context, subtaskRate, completedUnits),
+                    const SizedBox(height: 32),
+                    Text(
+                      'Weekly Activity',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: context.primaryFontColor,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildWeeklyBarChart(context, tasks),
+                    const SizedBox(height: 32),
+                    Text(
+                      'Category Breakdown',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: context.primaryFontColor,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildCategoryPieChart(context, tasks),
+                    const SizedBox(height: 40),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                _buildWeeklyBarChart(context, tasks),
-                const SizedBox(height: 32),
-                Text(
-                  'Category Breakdown',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: context.primaryFontColor,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _buildCategoryPieChart(context, tasks),
-                const SizedBox(height: 40),
-              ],
-            ),
+              );
+            },
           );
         },
       ),
     );
   }
 
+  Widget _buildLevelProgressCard(BuildContext context, UserProfileModel profile) {
+    int currentXpInLevel = profile.xp % 100;
+    double progress = currentXpInLevel / 100.0;
 
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.primaryColor, AppColors.primaryColor.withValues(alpha: 0.8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryColor.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Level ${profile.level}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    profile.rankTitle,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(HugeIcons.strokeRoundedCrown, color: Colors.white, size: 28),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'XP Progress',
+                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+              ),
+              Text(
+                '$currentXpInLevel / 100 XP',
+                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 10,
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildSummaryRow(BuildContext context, int completed, int pending, double rate) {
     return Row(
@@ -124,9 +266,9 @@ class AnalyticsScreen extends StatelessWidget {
           Text(
             value,
             style: GoogleFonts.poppins(
-              fontSize: 20, 
-              fontWeight: FontWeight.w700, 
-              color: context.primaryFontColor
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: context.primaryFontColor,
             ),
           ),
           Text(
@@ -134,9 +276,9 @@ class AnalyticsScreen extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.poppins(
-              fontSize: 11, 
-              fontWeight: FontWeight.w500, 
-              color: context.secondaryFontColor
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: context.secondaryFontColor,
             ),
           ),
         ],
@@ -190,7 +332,7 @@ class AnalyticsScreen extends StatelessWidget {
               getTooltipColor: (_) => context.cardColor,
               getTooltipItem: (group, groupIndex, rod, rodIndex) {
                 return BarTooltipItem(
-                  rod.toY.toInt().toString(),
+                  rod.toY.toStringAsFixed(1),
                   GoogleFonts.poppins(color: AppColors.primaryColor, fontWeight: FontWeight.bold),
                 );
               },
@@ -214,9 +356,9 @@ class AnalyticsScreen extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            "Complete some tasks to see breakdown", 
-            style: GoogleFonts.poppins(color: context.secondaryFontColor)
-          )
+            "Complete some tasks to see breakdown",
+            style: GoogleFonts.poppins(color: context.secondaryFontColor),
+          ),
         ),
       );
     }
@@ -281,16 +423,16 @@ class AnalyticsScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       Flexible(
                         child: Text(
-                          e.key, 
+                          e.key,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.poppins(fontSize: 12, color: context.primaryFontColor)
-                        )
+                          style: GoogleFonts.poppins(fontSize: 12, color: context.primaryFontColor),
+                        ),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '(${e.value.toStringAsFixed(e.value.truncateToDouble() == e.value ? 0 : 1)})',
-                        style: GoogleFonts.poppins(fontSize: 10, color: context.secondaryFontColor)
+                        style: GoogleFonts.poppins(fontSize: 10, color: context.secondaryFontColor),
                       ),
                     ],
                   ),

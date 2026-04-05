@@ -6,7 +6,6 @@ import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
 import 'package:clear_task/presentation/blocs/task/task_state.dart';
 import 'package:clear_task/presentation/blocs/theme/theme_cubit.dart';
-import 'package:clear_task/presentation/screens/celebrate_success_screen.dart';
 import 'package:clear_task/presentation/screens/create_task/create_task_screen.dart';
 import 'package:clear_task/presentation/screens/search_task_screen.dart';
 import 'package:clear_task/presentation/screens/analytics/analytics_screen.dart';
@@ -15,7 +14,12 @@ import 'package:clear_task/presentation/screens/pomodoro/pomodoro_screen.dart';
 import 'package:clear_task/presentation/screens/cloud_backup_screen.dart';
 import 'package:clear_task/presentation/screens/developer_info_screen.dart';
 import 'package:clear_task/core/services/contact_service.dart';
+import 'package:clear_task/data/repositories/user_stats_repository.dart';
+import 'package:clear_task/presentation/widgets/level_up_dialog.dart';
+import 'package:clear_task/presentation/widgets/task_completion_dialog.dart';
+import 'package:clear_task/presentation/widgets/daily_bonus_dialog.dart';
 import 'package:clear_task/presentation/widgets/task_list_widget.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -31,6 +35,27 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late final TabController _tabController;
+  StreamSubscription<int>? _levelUpSubscription;
+  
+  final List<Future<dynamic> Function()> _dialogQueue = [];
+  bool _isProcessingQueue = false;
+
+  void _enqueueDialog(Future<dynamic> Function() dialogBuilder) {
+    _dialogQueue.add(dialogBuilder);
+    if (!_isProcessingQueue) {
+      _processQueue();
+    }
+  }
+
+  Future<void> _processQueue() async {
+    _isProcessingQueue = true;
+    while (_dialogQueue.isNotEmpty) {
+      if (!mounted) break;
+      final builder = _dialogQueue.removeAt(0);
+      await builder();
+    }
+    _isProcessingQueue = false;
+  }
   final List<String> _tabTitles = [
     "All",
     "Today",
@@ -53,11 +78,36 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     if (currentState is! TasksLoaded) {
       context.read<TaskBloc>().add(FetchTasks());
     }
+
+    _levelUpSubscription = UserStatsRepository().levelUpStream.listen((newLevel) {
+      _enqueueDialog(() => Get.dialog(
+        LevelUpDialog(newLevel: newLevel),
+        barrierDismissible: false,
+      ));
+    });
+
+    // Check for daily login bonus (XP + Credit)
+    _checkDailyBonus();
+  }
+
+  Future<void> _checkDailyBonus() async {
+    // Small delay to ensure the screen is stable and navigation has finished
+    await Future.delayed(const Duration(milliseconds: 500));
+    if (!mounted) return;
+
+    final wasAwarded = await UserStatsRepository().checkAndAwardLoginBonus();
+    if (wasAwarded && mounted) {
+      _enqueueDialog(() => Get.dialog(
+        const DailyBonusDialog(),
+        barrierDismissible: false,
+      ));
+    }
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _levelUpSubscription?.cancel();
     super.dispose();
   }
 
@@ -111,7 +161,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         actions: [
           IconButton(
-            onPressed: () => Get.to(() => const AnalyticsScreen()),
+            // onPressed: () => Get.to(() => const AnalyticsScreen()),
+            onPressed: () {
+              _enqueueDialog(() => Get.dialog(
+                const TaskCompletionDialog(),
+                barrierDismissible: false,
+              ));
+            },
             icon: const Icon(HugeIcons.strokeRoundedAnalytics01),
           ),
           Padding(
@@ -266,7 +322,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       body: BlocConsumer<TaskBloc, TaskState>(
         listener: (context, state) {
           if (state is CelebrateSuccess) {
-            Get.to(() => const CelebrateSuccessScreen());
+            _enqueueDialog(() => Get.dialog(
+              const TaskCompletionDialog(),
+              barrierDismissible: false,
+            ));
           }
         },
         builder: (context, state) {

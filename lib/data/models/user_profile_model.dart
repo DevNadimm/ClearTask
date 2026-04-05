@@ -6,6 +6,10 @@ class UserProfileModel {
   final String email;
   final String? photoUrl;
   final DateTime createdAt;
+  final int xp;
+  final int level;
+  final String rankTitle;
+  final String? lastLoginBonusDate;
 
   UserProfileModel({
     required this.id,
@@ -13,6 +17,10 @@ class UserProfileModel {
     required this.email,
     this.photoUrl,
     required this.createdAt,
+    this.xp = 0,
+    this.level = 1,
+    this.rankTitle = 'Novice',
+    this.lastLoginBonusDate,
   });
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json, String id) {
@@ -24,6 +32,10 @@ class UserProfileModel {
       createdAt: json['createdAt'] != null
           ? (json['createdAt'] as Timestamp).toDate()
           : DateTime.now(),
+      xp: json['xp'] ?? 0,
+      level: json['level'] ?? 1,
+      rankTitle: json['rankTitle'] ?? 'Novice',
+      lastLoginBonusDate: json['lastLoginBonusDate'],
     );
   }
 
@@ -33,6 +45,10 @@ class UserProfileModel {
       'email': email,
       'photoUrl': photoUrl,
       'createdAt': Timestamp.fromDate(createdAt),
+      'xp': xp,
+      'level': level,
+      'rankTitle': rankTitle,
+      'lastLoginBonusDate': lastLoginBonusDate,
     };
   }
 
@@ -42,6 +58,10 @@ class UserProfileModel {
     String? email,
     String? photoUrl,
     DateTime? createdAt,
+    int? xp,
+    int? level,
+    String? rankTitle,
+    String? lastLoginBonusDate,
   }) {
     return UserProfileModel(
       id: id ?? this.id,
@@ -49,6 +69,10 @@ class UserProfileModel {
       email: email ?? this.email,
       photoUrl: photoUrl ?? this.photoUrl,
       createdAt: createdAt ?? this.createdAt,
+      xp: xp ?? this.xp,
+      level: level ?? this.level,
+      rankTitle: rankTitle ?? this.rankTitle,
+      lastLoginBonusDate: lastLoginBonusDate ?? this.lastLoginBonusDate,
     );
   }
 }

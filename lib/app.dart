@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:get/get.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -43,6 +43,8 @@ class MyApp extends StatelessWidget {
                 final userId = authState.user!.uid;
                 context.read<SyncCubit>().sync(userId);
                 context.read<CreditCubit>().fetchCredit(userId);
+                // 1. Grant daily credit (1 Credit)
+                context.read<CreditCubit>().checkAndGrantDaily(userId);
                 context.read<CreditCubit>().checkAndGrantDaily(userId);
               } else if (authState.status == AuthStatus.unauthenticated) {
                 context.read<SyncCubit>().clearUser();

@@ -4,6 +4,7 @@ class Subtask {
   final String title;
   bool isCompleted;
   final String? completedAt;
+  bool isXpAwarded;
 
   Subtask({
     this.id,
@@ -11,6 +12,7 @@ class Subtask {
     required this.title,
     this.isCompleted = false,
     this.completedAt,
+    this.isXpAwarded = false,
   });
 
   @override
@@ -24,6 +26,7 @@ class Subtask {
       'title': subtask.title,
       'isCompleted': subtask.isCompleted ? 1 : 0,
       'completedAt': subtask.completedAt,
+      'isXpAwarded': subtask.isXpAwarded ? 1 : 0,
     };
     if (subtask.id != null) map['id'] = subtask.id!;
     return map;
@@ -36,16 +39,18 @@ class Subtask {
       title: map['title'],
       isCompleted: map['isCompleted'] == 1,
       completedAt: map['completedAt'],
+      isXpAwarded: map['isXpAwarded'] == 1,
     );
   }
 
-  Subtask copyWith({int? id, int? taskId, String? title, bool? isCompleted, String? completedAt}) {
+  Subtask copyWith({int? id, int? taskId, String? title, bool? isCompleted, String? completedAt, bool? isXpAwarded}) {
     return Subtask(
       id: id ?? this.id,
       taskId: taskId ?? this.taskId,
       title: title ?? this.title,
       isCompleted: isCompleted ?? this.isCompleted,
       completedAt: completedAt ?? this.completedAt,
+      isXpAwarded: isXpAwarded ?? this.isXpAwarded,
     );
   }
 }
@@ -60,6 +65,7 @@ class Task {
   final bool sendNotification;
   final String? notificationTime;
   final String? completedAt;
+  bool isXpAwarded;
 
   // Cloud sync fields
   final String? cloudId;
@@ -83,6 +89,7 @@ class Task {
     this.sendNotification = false,
     this.notificationTime,
     this.completedAt,
+    this.isXpAwarded = false,
     this.cloudId,
     this.isSynced = false,
     this.isDeleted = false,
@@ -134,6 +141,7 @@ Task(
       'sendNotification': task.sendNotification ? 1 : 0,
       'notificationTime': task.notificationTime,
       'completedAt': task.completedAt,
+      'isXpAwarded': task.isXpAwarded ? 1 : 0,
       'isSynced': task.isSynced ? 1 : 0,
       'isDeleted': task.isDeleted ? 1 : 0,
       // Persist the stored value (not the computed getter) so plain tasks work.
@@ -156,6 +164,7 @@ Task(
       sendNotification: map['sendNotification'] == 1,
       notificationTime: map['notificationTime'],
       completedAt: map['completedAt'],
+      isXpAwarded: map['isXpAwarded'] == 1,
       cloudId: map['cloudId'],
       isSynced: map['isSynced'] == 1,
       isDeleted: map['isDeleted'] == 1,
@@ -174,6 +183,7 @@ Task(
     bool? sendNotification,
     Object? notificationTime = _sentinel,
     String? completedAt,
+    bool? isXpAwarded,
     String? cloudId,
     bool? isSynced,
     bool? isDeleted,
@@ -193,6 +203,7 @@ Task(
           ? this.notificationTime
           : (notificationTime as String?),
       completedAt: completedAt ?? this.completedAt,
+      isXpAwarded: isXpAwarded ?? this.isXpAwarded,
       cloudId: cloudId ?? this.cloudId,
       isSynced: isSynced ?? this.isSynced,
       isDeleted: isDeleted ?? this.isDeleted,

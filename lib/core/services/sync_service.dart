@@ -100,6 +100,7 @@ class SyncService {
           'isSynced': 1,
           'isDeleted': 0,
           'calendarEventId': data['calendarEventId'],
+          'isXpAwarded': (data['isXpAwarded'] == true || data['isXpAwarded'] == 1) ? 1 : 0,
         });
 
         // Pull subtasks
@@ -110,6 +111,7 @@ class SyncService {
               'taskId': taskId,
               'title': st['title'] ?? '',
               'isCompleted': st['isCompleted'] ?? 0,
+              'isXpAwarded': (st['isXpAwarded'] == true || st['isXpAwarded'] == 1) ? 1 : 0,
             });
           }
         }
@@ -142,10 +144,12 @@ class SyncService {
       'isCompleted': localMap['isCompleted'],
       'completedAt': localMap['completedAt'],
       'calendarEventId': localMap['calendarEventId'],
+      'isXpAwarded': localMap['isXpAwarded'],
       'subtasks': subtaskMaps
           .map((s) => {
                 'title': s['title'],
                 'isCompleted': s['isCompleted'],
+                'isXpAwarded': s['isXpAwarded'],
               })
           .toList(),
       'updatedAt': FieldValue.serverTimestamp(),
