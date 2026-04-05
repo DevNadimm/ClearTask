@@ -1,4 +1,5 @@
 import 'package:clear_task/core/utils/helper_functions/ad_helper.dart';
+import 'package:clear_task/presentation/blocs/credit/credit_cubit.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 /// Manages loading and showing rewarded ads for bonus AI uses.
@@ -33,7 +34,9 @@ class RewardedAdService {
   /// Shows the rewarded ad. Calls [onReward] when the user earns the reward.
   /// Calls [onAdDismissed] when the ad is closed (regardless of reward).
   static void show({
-    required void Function(int bonusUses) onReward,
+    required String userId,
+    required CreditCubit creditCubit,
+    void Function()? onRewardSuccess,
     void Function()? onAdDismissed,
     void Function()? onAdNotReady,
   }) {
@@ -59,7 +62,9 @@ class RewardedAdService {
 
     _rewardedAd!.show(
       onUserEarnedReward: (ad, reward) {
-        onReward(2); // Grant 2 bonus AI uses
+        // Grant 1 AI credit (configurable)
+        creditCubit.rewardFromAd(userId, 1);
+        onRewardSuccess?.call();
       },
     );
   }

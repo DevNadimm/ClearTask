@@ -4,7 +4,8 @@ import 'package:clear_task/data/models/day_plan_model.dart';
 import 'package:clear_task/data/models/task_model.dart';
 import 'package:clear_task/data/services/ai_service.dart';
 import 'package:clear_task/presentation/widgets/ai_limit_dialog.dart';
-import 'package:clear_task/presentation/blocs/premium/premium_cubit.dart';
+import 'package:clear_task/presentation/blocs/auth/auth_cubit.dart';
+import 'package:clear_task/presentation/blocs/credit/credit_cubit.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_state.dart';
 import 'package:flutter/material.dart';
@@ -71,10 +72,16 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen> with SingleTickerProv
   }
 
   Future<void> _generatePlan(List<Task> allPending) async {
-    final premiumCubit = context.read<PremiumCubit>();
+    final authCubit = context.read<AuthCubit>();
+    final creditCubit = context.read<CreditCubit>();
 
-    // Check usage limit
-    if (!premiumCubit.state.canUseAi) {
+    if (authCubit.state.status != AuthStatus.authenticated) {
+      AiLimitDialog.show(context);
+      return;
+    }
+
+    final balance = creditCubit.state.credit?.balance ?? 0;
+    if (balance <= 0) {
       AiLimitDialog.show(context);
       return;
     }
@@ -103,16 +110,18 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen> with SingleTickerProv
       _dayPlan = null;
     });
 
-    // Consume one AI use
-    final allowed = await premiumCubit.tryUseAi();
-    if (!allowed) {
-      setState(() => _isLoading = false);
-      AiLimitDialog.show(context);
-      return;
-    }
-
     try {
       final plan = await AiService.planMyDay(selectedTasks);
+      
+      // Spend credit
+      final spent = await creditCubit.spendCredit(authCubit.state.user!.uid, 1);
+      if (!spent) {
+        if (mounted) {
+           AiLimitDialog.show(context);
+           setState(() => _isLoading = false);
+        }
+        return;
+      }
       if (mounted) {
         setState(() {
           _dayPlan = plan;
@@ -159,8 +168,9 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen> with SingleTickerProv
         title: const Text('Plan My Day'),
         actions: [
           // Usage counter badge
-          BlocBuilder<PremiumCubit, PremiumState>(
-            builder: (context, premiumState) {
+          BlocBuilder<CreditCubit, CreditState>(
+            builder: (context, creditState) {
+              final balance = creditState.credit?.balance ?? 0;
               return Padding(
                 padding: const EdgeInsets.only(right: 16),
                 child: Container(
@@ -177,7 +187,7 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen> with SingleTickerProv
                           size: 16, color: AppColors.primaryColor),
                       const SizedBox(width: 6),
                       Text(
-                        '${premiumState.remainingUses}/${premiumState.totalAllowed}',
+                        '$balance Credits',
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,

@@ -45,9 +45,10 @@ class _SearchTaskScreenState extends State<SearchTaskScreen> {
             context.read<TaskBloc>().add(FetchTasks());
             Get.back();
           },
-          icon: const Icon(
+          icon: Icon(
             HugeIcons.strokeRoundedArrowLeft01,
-            size: 34,
+            size: 30,
+            color: context.primaryFontColor,
           ),
         ),
         title: _buildSearchField(),

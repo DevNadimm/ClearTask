@@ -1,6 +1,7 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/data/services/rewarded_ad_service.dart';
-import 'package:clear_task/presentation/blocs/premium/premium_cubit.dart';
+import 'package:clear_task/presentation/blocs/auth/auth_cubit.dart';
+import 'package:clear_task/presentation/blocs/credit/credit_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,7 +19,7 @@ class AiLimitDialog {
             const Icon(HugeIcons.strokeRoundedAlert02, color: AppColors.warning, size: 28),
             const SizedBox(width: 12),
             Text(
-              'AI Limit Reached',
+              'AI Credits',
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w700,
                 color: ctx.primaryFontColor,
@@ -29,36 +30,58 @@ class AiLimitDialog {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'You\'ve used all your free AI uses this week.\nWatch a short ad to get 2 more uses!',
-              style: GoogleFonts.poppins(
-                color: ctx.secondaryFontColor,
-                fontSize: 14,
-              ),
+            Builder(
+              builder: (ctx) {
+                final authState = ctx.read<AuthCubit>().state;
+                if (authState.status != AuthStatus.authenticated) {
+                  return Text(
+                    'You must be logged in to use AI features and earn credits.',
+                    style: GoogleFonts.poppins(
+                      color: ctx.secondaryFontColor,
+                      fontSize: 14,
+                    ),
+                  );
+                }
+
+                return Text(
+                  'You\'ve run out of AI credits.\nWatch a short ad to earn +1 credit!',
+                  style: GoogleFonts.poppins(
+                    color: ctx.secondaryFontColor,
+                    fontSize: 14,
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 20),
             // Watch Ad Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  _showRewardedAd(context);
-                },
-                icon: const Icon(HugeIcons.strokeRoundedVideo01, size: 20),
-                label: Text(
-                  'Watch Ad for +2 Uses',
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor,
-                  foregroundColor: ctx.buttonFontColor,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+            Builder(
+              builder: (ctx) {
+                final authState = ctx.read<AuthCubit>().state;
+                final bool isLoggedIn = authState.status == AuthStatus.authenticated;
+
+                return SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: !isLoggedIn ? null : () {
+                      Navigator.pop(ctx);
+                      _showRewardedAd(context, authState.user!.uid);
+                    },
+                    icon: const Icon(HugeIcons.strokeRoundedVideo01, size: 20),
+                    label: Text(
+                      isLoggedIn ? 'Watch Ad for +1 Credit' : 'Login Required',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      foregroundColor: ctx.buttonFontColor,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),
@@ -66,14 +89,16 @@ class AiLimitDialog {
     );
   }
 
-  static void _showRewardedAd(BuildContext context) {
+  static void _showRewardedAd(BuildContext context, String userId) {
+    final creditCubit = context.read<CreditCubit>();
     RewardedAdService.show(
-      onReward: (bonus) {
-        context.read<PremiumCubit>().grantBonusUses(bonus);
+      userId: userId,
+      creditCubit: creditCubit,
+      onRewardSuccess: () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '🎉 You earned $bonus extra AI uses!',
+              '🎉 You earned +1 AI credit!',
               style: GoogleFonts.poppins(),
             ),
             behavior: SnackBarBehavior.floating,

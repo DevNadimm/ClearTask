@@ -17,7 +17,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:clear_task/data/services/ai_service.dart';
-import 'package:clear_task/presentation/blocs/premium/premium_cubit.dart';
+import 'package:clear_task/presentation/blocs/auth/auth_cubit.dart';
+import 'package:clear_task/presentation/blocs/credit/credit_cubit.dart';
 import 'package:clear_task/presentation/widgets/ai_limit_dialog.dart';
 
 class CreateTaskView extends StatefulWidget {
@@ -179,20 +180,21 @@ class _CreateTaskViewState extends State<CreateTaskView> {
       return;
     }
 
-    final premiumCubit = context.read<PremiumCubit>();
-    if (!premiumCubit.state.canUseAi) {
+    final authCubit = context.read<AuthCubit>();
+    final creditCubit = context.read<CreditCubit>();
+
+    if (authCubit.state.status != AuthStatus.authenticated) {
+      AiLimitDialog.show(context);
+      return;
+    }
+
+    final balance = creditCubit.state.credit?.balance ?? 0;
+    if (balance <= 0) {
       AiLimitDialog.show(context);
       return;
     }
 
     setState(() => _isGeneratingSubtasks = true);
-
-    final allowed = await premiumCubit.tryUseAi();
-    if (!allowed) {
-      if (mounted) setState(() => _isGeneratingSubtasks = false);
-      AiLimitDialog.show(context);
-      return;
-    }
 
     try {
       String? cleanNote;
@@ -216,7 +218,18 @@ class _CreateTaskViewState extends State<CreateTaskView> {
         taskType: taskType.text,
         note: cleanNote,
       );
+
       if (generatedSubtasks.isNotEmpty) {
+        // Only spend credit if generation was successful
+        final spent = await creditCubit.spendCredit(authCubit.state.user!.uid, 1);
+        if (!spent) {
+           if (mounted) {
+             AiLimitDialog.show(context);
+             setState(() => _isGeneratingSubtasks = false);
+           }
+           return;
+        }
+
         setState(() {
           for (final subtaskTitle in generatedSubtasks) {
             final controller = TextEditingController(text: subtaskTitle);
