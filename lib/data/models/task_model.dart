@@ -3,17 +3,19 @@ class Subtask {
   final int taskId;
   final String title;
   bool isCompleted;
+  final String? completedAt;
 
   Subtask({
     this.id,
     required this.taskId,
     required this.title,
     this.isCompleted = false,
+    this.completedAt,
   });
 
   @override
   String toString() {
-    return 'Subtask(id: $id, taskId: $taskId, title: $title, isCompleted: $isCompleted)';
+    return 'Subtask(id: $id, taskId: $taskId, title: $title, isCompleted: $isCompleted, completedAt: $completedAt)';
   }
 
   static Map<String, dynamic> toMap(Subtask subtask) {
@@ -21,6 +23,7 @@ class Subtask {
       'taskId': subtask.taskId,
       'title': subtask.title,
       'isCompleted': subtask.isCompleted ? 1 : 0,
+      'completedAt': subtask.completedAt,
     };
     if (subtask.id != null) map['id'] = subtask.id!;
     return map;
@@ -32,15 +35,17 @@ class Subtask {
       taskId: map['taskId'],
       title: map['title'],
       isCompleted: map['isCompleted'] == 1,
+      completedAt: map['completedAt'],
     );
   }
 
-  Subtask copyWith({int? id, int? taskId, String? title, bool? isCompleted}) {
+  Subtask copyWith({int? id, int? taskId, String? title, bool? isCompleted, String? completedAt}) {
     return Subtask(
       id: id ?? this.id,
       taskId: taskId ?? this.taskId,
       title: title ?? this.title,
       isCompleted: isCompleted ?? this.isCompleted,
+      completedAt: completedAt ?? this.completedAt,
     );
   }
 }

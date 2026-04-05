@@ -2,6 +2,7 @@ import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/data/models/task_model.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_state.dart';
+import 'package:clear_task/presentation/screens/analytics/analytics_service.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,16 +37,22 @@ class AnalyticsScreen extends StatelessWidget {
           }
 
           final tasks = state.tasks;
-          final completedTasks = tasks.where((t) => t.isCompleted).toList();
-          final pendingTasksCount = tasks.length - completedTasks.length;
-          final completionRate = tasks.isEmpty ? 0.0 : (completedTasks.length / tasks.length) * 100;
+          
+          final completedUnits = AnalyticsService.getTrueCompletionCount(tasks);
+          final pendingUnits = AnalyticsService.getTotalIncompleteUnits(tasks);
+          final totalTasks = tasks.length;
+          final overallScore = AnalyticsService.calculateOverallScore(tasks);
+          final scoreRate = totalTasks == 0 ? 0.0 : (overallScore / totalTasks) * 100;
+          final subtaskRate = AnalyticsService.getSubtaskCompletionRate(tasks);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSummaryRow(context, completedTasks.length, pendingTasksCount, completionRate),
+                _buildSummaryRow(context, completedUnits, pendingUnits, scoreRate),
+                const SizedBox(height: 12),
+                _buildAdditionalMetricsRow(context, subtaskRate, completedUnits),
                 const SizedBox(height: 32),
                 Text(
                   'Weekly Activity',
@@ -56,7 +63,7 @@ class AnalyticsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                _buildWeeklyBarChart(context, completedTasks),
+                _buildWeeklyBarChart(context, tasks),
                 const SizedBox(height: 32),
                 Text(
                   'Category Breakdown',
@@ -67,7 +74,7 @@ class AnalyticsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                _buildCategoryPieChart(context, completedTasks),
+                _buildCategoryPieChart(context, tasks),
                 const SizedBox(height: 40),
               ],
             ),
@@ -82,11 +89,21 @@ class AnalyticsScreen extends StatelessWidget {
   Widget _buildSummaryRow(BuildContext context, int completed, int pending, double rate) {
     return Row(
       children: [
-        Expanded(child: _buildSummaryCard(context, 'Done', completed.toString(), HugeIcons.strokeRoundedTickDouble02, Colors.green)),
+        Expanded(child: _buildSummaryCard(context, 'Units Done', completed.toString(), HugeIcons.strokeRoundedTickDouble02, Colors.green)),
         const SizedBox(width: 12),
         Expanded(child: _buildSummaryCard(context, 'Pending', pending.toString(), HugeIcons.strokeRoundedLoading03, Colors.orange)),
         const SizedBox(width: 12),
         Expanded(child: _buildSummaryCard(context, 'Score', '${rate.toStringAsFixed(0)}%', HugeIcons.strokeRoundedRocket01, AppColors.primaryColor)),
+      ],
+    );
+  }
+
+  Widget _buildAdditionalMetricsRow(BuildContext context, double subtaskRate, int trueCompletion) {
+    return Row(
+      children: [
+        Expanded(child: _buildSummaryCard(context, 'Subtask Rate', '${subtaskRate.toStringAsFixed(0)}%', HugeIcons.strokeRoundedTaskDone01, Colors.blue)),
+        const SizedBox(width: 12),
+        Expanded(child: _buildSummaryCard(context, 'Total completed', trueCompletion.toString(), HugeIcons.strokeRoundedLayers01, Colors.purple)),
       ],
     );
   }
@@ -127,54 +144,12 @@ class AnalyticsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWeeklyBarChart(BuildContext context, List<Task> completedTasks) {
+  Widget _buildWeeklyBarChart(BuildContext context, List<Task> tasks) {
     final now = DateTime.now();
-    final Map<int, int> dayCounts = {};
-    for (int i = 0; i < 7; i++) {
-       final day = DateTime(now.year, now.month, now.day).subtract(Duration(days: i));
-       dayCounts[day.weekday] = 0;
-    }
-
-    for (var task in completedTasks) {
-      if (task.completedAt != null) {
-        try {
-          final date = DateTime.parse(task.completedAt!);
-          final difference = now.difference(date).inDays;
-          if (difference >= 0 && difference < 7) {
-            dayCounts[date.weekday] = (dayCounts[date.weekday] ?? 0) + 1;
-          }
-        } catch (_) {}
-      }
-    }
-
     final weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    List<BarChartGroupData> groups = [];
     
-    double maxCount = 5;
-    for (int i = 0; i < 7; i++) {
-      final date = now.subtract(Duration(days: 6 - i));
-      final count = dayCounts[date.weekday] ?? 0;
-      if (count > maxCount) maxCount = count.toDouble();
-      
-      groups.add(
-        BarChartGroupData(
-          x: i,
-          barRods: [
-            BarChartRodData(
-              toY: count.toDouble(),
-              color: AppColors.primaryColor,
-              width: 14,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
-              backDrawRodData: BackgroundBarChartRodData(
-                show: true,
-                toY: maxCount + 1,
-                color: context.inputBorderColor.withValues(alpha: 0.15),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+    List<BarChartGroupData> groups = AnalyticsService.getWeeklyData(tasks, context, AppColors.primaryColor);
+    double maxCount = AnalyticsService.getMaxWeeklyScore(tasks);
 
     return Container(
       height: 250,
@@ -226,8 +201,10 @@ class AnalyticsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryPieChart(BuildContext context, List<Task> completedTasks) {
-    if (completedTasks.isEmpty) {
+  Widget _buildCategoryPieChart(BuildContext context, List<Task> tasks) {
+    final Map<String, double> categories = AnalyticsService.getCategoryBreakdown(tasks);
+
+    if (categories.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
@@ -242,11 +219,6 @@ class AnalyticsScreen extends StatelessWidget {
           )
         ),
       );
-    }
-
-    final Map<String, int> categories = {};
-    for (var task in completedTasks) {
-      categories[task.taskType] = (categories[task.taskType] ?? 0) + 1;
     }
 
     final List<PieChartSectionData> sections = [];
@@ -317,7 +289,7 @@ class AnalyticsScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '(${e.value})', 
+                        '(${e.value.toStringAsFixed(e.value.truncateToDouble() == e.value ? 0 : 1)})',
                         style: GoogleFonts.poppins(fontSize: 10, color: context.secondaryFontColor)
                       ),
                     ],

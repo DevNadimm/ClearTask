@@ -14,7 +14,7 @@ class DBHelper {
 
     _db = await openDatabase(
       path,
-      version: 6,
+      version: 7,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -48,6 +48,7 @@ class DBHelper {
         taskId INTEGER NOT NULL,
         title TEXT NOT NULL,
         isCompleted INTEGER NOT NULL,
+        completedAt TEXT,
         FOREIGN KEY (taskId) REFERENCES tbl_task(id) ON DELETE CASCADE
       )
     ''');
@@ -90,6 +91,11 @@ class DBHelper {
     if (oldVersion < 6) {
       await db.execute('ALTER TABLE tbl_task ADD COLUMN note TEXT');
       debugPrint('🔄 Database upgraded to v6: note column added to tbl_task');
+    }
+
+    if (oldVersion < 7) {
+      await db.execute('ALTER TABLE tbl_subtask ADD COLUMN completedAt TEXT');
+      debugPrint('🔄 Database upgraded to v7: completedAt column added to tbl_subtask');
     }
   }
 

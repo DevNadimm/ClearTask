@@ -61,23 +61,13 @@ class AiLimitDialog {
 
                 return SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton.icon(
+                  child: ElevatedButton(
                     onPressed: !isLoggedIn ? null : () {
                       Navigator.pop(ctx);
                       _showRewardedAd(context, authState.user!.uid);
                     },
-                    icon: const Icon(HugeIcons.strokeRoundedVideo01, size: 20),
-                    label: Text(
+                    child: Text(
                       isLoggedIn ? 'Watch Ad for +1 Credit' : 'Login Required',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor,
-                      foregroundColor: ctx.buttonFontColor,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
                     ),
                   ),
                 );

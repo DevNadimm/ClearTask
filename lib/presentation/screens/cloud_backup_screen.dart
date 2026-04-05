@@ -134,10 +134,12 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
                 Text(
                   user.displayName ?? 'User',
                   style: GoogleFonts.poppins(
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: context.primaryFontColor,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -358,10 +360,7 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
           width: 1,
         ),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: child,
-      ),
+      child: child,
     );
   }
 
@@ -387,7 +386,7 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
-        shape: BoxShape.circle,
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Icon(_syncIcon(status), color: color, size: 24),
     );
@@ -425,15 +424,15 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
   IconData _syncIcon(SyncStatus status) {
     switch (status) {
       case SyncStatus.synced:
-        return Icons.check_circle_outline_rounded;
+        return HugeIcons.strokeRoundedCheckmarkSquare02;
       case SyncStatus.syncing:
-        return Icons.sync_rounded;
+        return HugeIcons.strokeRoundedArrowReloadHorizontal;
       case SyncStatus.error:
-        return Icons.error_outline_rounded;
+        return HugeIcons.strokeRoundedAlertSquare;
       case SyncStatus.offline:
-        return Icons.wifi_off_rounded;
+        return HugeIcons.strokeRoundedWifiOff02;
       default:
-        return Icons.cloud_queue_rounded;
+        return HugeIcons.strokeRoundedCloud;
     }
   }
 
