@@ -1,5 +1,6 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/core/utils/helper_functions/ad_helper.dart';
+import 'package:clear_task/core/services/sound_service.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,7 @@ class _TaskCompletionDialogState extends State<TaskCompletionDialog> {
   void initState() {
     super.initState();
     _loadInterstitialAd();
+    SoundService().playCelebration();
   }
 
   void _loadInterstitialAd() {

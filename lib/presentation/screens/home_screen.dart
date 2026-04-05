@@ -161,13 +161,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         actions: [
           IconButton(
-            // onPressed: () => Get.to(() => const AnalyticsScreen()),
-            onPressed: () {
-              _enqueueDialog(() => Get.dialog(
-                const TaskCompletionDialog(),
-                barrierDismissible: false,
-              ));
-            },
+            onPressed: () => Get.to(() => const AnalyticsScreen()),
             icon: const Icon(HugeIcons.strokeRoundedAnalytics01),
           ),
           Padding(

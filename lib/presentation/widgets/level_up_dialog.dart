@@ -1,4 +1,5 @@
 import 'package:clear_task/core/constants/colors.dart';
+import 'package:clear_task/core/services/sound_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
@@ -18,6 +19,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
+    SoundService().playCelebration();
   }
 
   @override

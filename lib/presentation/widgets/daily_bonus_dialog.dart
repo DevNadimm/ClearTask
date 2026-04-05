@@ -1,10 +1,22 @@
 import 'package:clear_task/core/constants/colors.dart';
+import 'package:clear_task/core/services/sound_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 
-class DailyBonusDialog extends StatelessWidget {
+class DailyBonusDialog extends StatefulWidget {
   const DailyBonusDialog({super.key});
+
+  @override
+  State<DailyBonusDialog> createState() => _DailyBonusDialogState();
+}
+
+class _DailyBonusDialogState extends State<DailyBonusDialog> {
+  @override
+  void initState() {
+    super.initState();
+    SoundService().playCelebration();
+  }
 
   @override
   Widget build(BuildContext context) {
