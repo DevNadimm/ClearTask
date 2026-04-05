@@ -89,7 +89,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           final totalTasks = tasks.length;
           final overallScore = AnalyticsService.calculateOverallScore(tasks);
           final scoreRate = totalTasks == 0 ? 0.0 : (overallScore / totalTasks) * 100;
-          final subtaskRate = AnalyticsService.getSubtaskCompletionRate(tasks);
 
           return StreamBuilder<UserProfileModel?>(
             stream: UserStatsRepository().getUserProfileStream(),
@@ -106,8 +105,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       const SizedBox(height: 24),
                     ],
                     _buildSummaryRow(context, completedUnits, pendingUnits, scoreRate),
-                    const SizedBox(height: 12),
-                    _buildAdditionalMetricsRow(context, subtaskRate, completedUnits),
                     const SizedBox(height: 32),
                     Text(
                       'Weekly Activity',
@@ -236,16 +233,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         Expanded(child: _buildSummaryCard(context, 'Pending', pending.toString(), HugeIcons.strokeRoundedLoading03, Colors.orange)),
         const SizedBox(width: 12),
         Expanded(child: _buildSummaryCard(context, 'Score', '${rate.toStringAsFixed(0)}%', HugeIcons.strokeRoundedRocket01, AppColors.primaryColor)),
-      ],
-    );
-  }
-
-  Widget _buildAdditionalMetricsRow(BuildContext context, double subtaskRate, int trueCompletion) {
-    return Row(
-      children: [
-        Expanded(child: _buildSummaryCard(context, 'Subtask Rate', '${subtaskRate.toStringAsFixed(0)}%', HugeIcons.strokeRoundedTaskDone01, Colors.blue)),
-        const SizedBox(width: 12),
-        Expanded(child: _buildSummaryCard(context, 'Total completed', trueCompletion.toString(), HugeIcons.strokeRoundedLayers01, Colors.purple)),
       ],
     );
   }
