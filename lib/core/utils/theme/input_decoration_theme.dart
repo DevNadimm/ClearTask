@@ -11,7 +11,7 @@ InputDecorationTheme darkInputDecorationTheme = InputDecorationTheme(
   hintStyle: const TextStyle().copyWith(fontSize: 14, color: AppColors.darkSecondaryFont),
   errorStyle: const TextStyle().copyWith(fontStyle: FontStyle.normal),
   floatingLabelStyle: const TextStyle().copyWith(
-    color: Colors.white.withOpacity(0.8),
+    color: Colors.white.withValues(alpha: 0.8),
   ),
   border: const OutlineInputBorder().copyWith(
     borderRadius: BorderRadius.circular(14),
@@ -45,7 +45,7 @@ InputDecorationTheme lightInputDecorationTheme = InputDecorationTheme(
   hintStyle: const TextStyle().copyWith(fontSize: 14, color: AppColors.lightSecondaryFont),
   errorStyle: const TextStyle().copyWith(fontStyle: FontStyle.normal),
   floatingLabelStyle: const TextStyle().copyWith(
-    color: Colors.black.withOpacity(0.8),
+    color: Colors.black.withValues(alpha: 0.8),
   ),
   border: const OutlineInputBorder().copyWith(
     borderRadius: BorderRadius.circular(14),

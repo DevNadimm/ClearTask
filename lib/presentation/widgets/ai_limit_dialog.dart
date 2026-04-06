@@ -1,7 +1,7 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/data/services/rewarded_ad_service.dart';
 import 'package:clear_task/presentation/blocs/auth/auth_cubit.dart';
-import 'package:clear_task/presentation/blocs/credit/credit_cubit.dart';
+import 'package:clear_task/presentation/blocs/wallet/wallet_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,7 +19,7 @@ class AiLimitDialog {
             const Icon(HugeIcons.strokeRoundedAlert02, color: AppColors.warning, size: 28),
             const SizedBox(width: 12),
             Text(
-              'AI Credits',
+              'AI Coins',
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w700,
                 color: ctx.primaryFontColor,
@@ -35,7 +35,7 @@ class AiLimitDialog {
                 final authState = ctx.read<AuthCubit>().state;
                 if (authState.status != AuthStatus.authenticated) {
                   return Text(
-                    'You must be logged in to use AI features and earn credits.',
+                    'You must be logged in to use AI features and earn coins.',
                     style: GoogleFonts.poppins(
                       color: ctx.secondaryFontColor,
                       fontSize: 14,
@@ -44,7 +44,7 @@ class AiLimitDialog {
                 }
 
                 return Text(
-                  'You\'ve run out of AI credits.\nWatch a short ad to earn +1 credit!',
+                  'You\'ve run out of AI coins.\nWatch a short ad to earn +15 coins!',
                   style: GoogleFonts.poppins(
                     color: ctx.secondaryFontColor,
                     fontSize: 14,
@@ -67,7 +67,7 @@ class AiLimitDialog {
                       _showRewardedAd(context, authState.user!.uid);
                     },
                     child: Text(
-                      isLoggedIn ? 'Watch Ad for +1 Credit' : 'Login Required',
+                      isLoggedIn ? 'Watch Ad for +15 Coins' : 'Login Required',
                     ),
                   ),
                 );
@@ -80,15 +80,15 @@ class AiLimitDialog {
   }
 
   static void _showRewardedAd(BuildContext context, String userId) {
-    final creditCubit = context.read<CreditCubit>();
+    final walletCubit = context.read<WalletCubit>();
     RewardedAdService.show(
       userId: userId,
-      creditCubit: creditCubit,
+      walletCubit: walletCubit,
       onRewardSuccess: () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '🎉 You earned +1 AI credit!',
+              '🎉 You earned +15 AI coins!',
               style: GoogleFonts.poppins(),
             ),
             behavior: SnackBarBehavior.floating,

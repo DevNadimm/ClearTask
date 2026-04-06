@@ -4,28 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 
-class LevelUpDialog extends StatefulWidget {
-  final int newLevel;
-  const LevelUpDialog({super.key, required this.newLevel});
+class SignupBonusDialog extends StatefulWidget {
+  const SignupBonusDialog({super.key});
 
   @override
-  State<LevelUpDialog> createState() => _LevelUpDialogState();
+  State<SignupBonusDialog> createState() => _SignupBonusDialogState();
 }
 
-class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
+class _SignupBonusDialogState extends State<SignupBonusDialog> {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this);
     SoundService().playCelebration();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
@@ -46,53 +36,19 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: 100), // Space for floating Lottie
+                const SizedBox(height: 100),
                 Text(
-                  'LEVEL UP!',
+                  'Welcome!',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
-                    fontSize: 32,
+                    fontSize: 28,
                     fontWeight: FontWeight.w900,
-                    color: AppColors.primaryColor,
-                    letterSpacing: 2,
+                    color: context.primaryFontColor,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'You reached Level ${widget.newLevel}',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: context.primaryFontColor,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.stars_rounded, color: Colors.amber, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        '+25 Coins',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.amber,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Your productivity is skyrocketing! Keep up the amazing work and unlock more ranks.',
+                  "Thank you for joining ClearTask! Here's a special starter gift to help you plan your day.",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
@@ -100,6 +56,25 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                   ),
                 ),
                 const SizedBox(height: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildRewardItem(
+                      context,
+                      icon: Icons.flash_on,
+                      label: '+20 XP',
+                      color: Colors.orangeAccent,
+                    ),
+                    const SizedBox(width: 10),
+                    _buildRewardItem(
+                      context,
+                      icon: Icons.stars_rounded,
+                      label: '+30 Coins',
+                      color: AppColors.primaryColor,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 40),
                 SizedBox(
                   width: double.infinity,
                   height: 55,
@@ -114,7 +89,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                       ),
                     ),
                     child: Text(
-                      'Awesome!',
+                      "Start Productivity",
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -132,15 +107,39 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
               width: 250,
               child: Lottie.asset(
                 'assets/animations/celebration.json',
-                controller: _controller,
-                onLoaded: (composition) {
-                  _controller.duration = composition.duration;
-                  _controller.forward();
-                },
+                repeat: false,
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildRewardItem(BuildContext context,
+      {required IconData icon, required String label, required Color color}) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withValues(alpha: 0.2), width: 1.5),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 32, color: color),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: context.primaryFontColor,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:clear_task/data/datasources/preferences_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -53,7 +54,7 @@ class AuthService {
   Future<void> _initializeUserData(User user) async {
     final firestore = FirebaseFirestore.instance;
     final profileRef = firestore.collection('users').doc(user.uid).collection('profile').doc('data');
-    final creditRef = firestore.collection('users').doc(user.uid).collection('credit').doc('data');
+    final walletRef = firestore.collection('users').doc(user.uid).collection('wallet').doc('data');
 
     try {
       final profileDoc = await profileRef.get();
@@ -68,19 +69,24 @@ class AuthService {
           'email': user.email ?? '',
           'photoUrl': user.photoURL,
           'createdAt': FieldValue.serverTimestamp(),
-          'xp': 0,
+          'xp': 20,
           'level': 1,
-          'rankTitle': 'Novice',
+          'rankTitle': 'Starter',
         });
 
-        // 2. Create Credit with Signup Bonus (4)
-        batch.set(creditRef, {
-          'balance': 4,
+        // 2. Create Wallet with Signup (30) + First Day Daily (15) = 45 Coins
+        final now = DateTime.now();
+        final todayStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+        
+        batch.set(walletRef, {
+          'coins': 30,
           'totalSpent': 0,
-          'lastDailyGrant': null,
+          'totalEarned': 30,
+          'lastDailyRewardDate': null,
         });
 
         await batch.commit();
+        await PreferencesHelper().setJustSignedUp(true);
         debugPrint('✅ User data initialized successfully.');
       } else {
         debugPrint('👋 Returning user detected. No re-initialization needed.');

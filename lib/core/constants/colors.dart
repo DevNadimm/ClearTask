@@ -58,6 +58,8 @@ extension ThemeColors on BuildContext {
       _isDark ? AppColors.darkInputBorder : AppColors.lightInputBorder;
   Color get inputBorderFocusedColor =>
       _isDark ? AppColors.darkInputBorderFocused : AppColors.lightInputBorderFocused;
+  Color get dividerColor =>
+      _isDark ? const Color(0xFF333333) : const Color(0xFFE0E0E0);
   Color get cardOverlay =>
       _isDark ? AppColors.darkCardOverlay : AppColors.lightCardOverlay;
 }

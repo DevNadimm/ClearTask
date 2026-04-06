@@ -112,7 +112,7 @@ class _TaskCompletionDialogState extends State<TaskCompletionDialog> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  "You've completed all your tasks successfully.\nKeep up the great work!",
+                  "You've completed all your tasks successfully.",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 14,

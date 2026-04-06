@@ -68,8 +68,8 @@ class _DailyBonusDialogState extends State<DailyBonusDialog> {
                     const SizedBox(width: 10),
                     _buildRewardItem(
                       context,
-                      icon: Icons.stars,
-                      label: '+1 Credit',
+                      icon: Icons.stars_rounded,
+                      label: '+15 Coins',
                       color: AppColors.primaryColor,
                     ),
                   ],

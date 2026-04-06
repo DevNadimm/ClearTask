@@ -5,7 +5,7 @@ import 'package:clear_task/data/models/task_model.dart';
 import 'package:clear_task/data/services/ai_service.dart';
 import 'package:clear_task/presentation/widgets/ai_limit_dialog.dart';
 import 'package:clear_task/presentation/blocs/auth/auth_cubit.dart';
-import 'package:clear_task/presentation/blocs/credit/credit_cubit.dart';
+import 'package:clear_task/presentation/blocs/wallet/wallet_cubit.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_state.dart';
 import 'package:flutter/material.dart';
@@ -73,15 +73,15 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen> with SingleTickerProv
 
   Future<void> _generatePlan(List<Task> allPending) async {
     final authCubit = context.read<AuthCubit>();
-    final creditCubit = context.read<CreditCubit>();
+    final walletCubit = context.read<WalletCubit>();
 
     if (authCubit.state.status != AuthStatus.authenticated) {
       AiLimitDialog.show(context);
       return;
     }
 
-    final balance = creditCubit.state.credit?.balance ?? 0;
-    if (balance <= 0) {
+    final coins = walletCubit.state.wallet?.coins ?? 0;
+    if (coins < 10) {
       AiLimitDialog.show(context);
       return;
     }
@@ -113,8 +113,8 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen> with SingleTickerProv
     try {
       final plan = await AiService.planMyDay(selectedTasks);
       
-      // Spend credit
-      final spent = await creditCubit.spendCredit(authCubit.state.user!.uid, 1);
+      // Spend coins
+      final spent = await walletCubit.spendCoins(authCubit.state.user!.uid, 10);
       if (!spent) {
         if (mounted) {
            AiLimitDialog.show(context);
@@ -168,9 +168,9 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen> with SingleTickerProv
         title: const Text('Plan My Day'),
         actions: [
           // Usage counter badge
-          BlocBuilder<CreditCubit, CreditState>(
-            builder: (context, creditState) {
-              final balance = creditState.credit?.balance ?? 0;
+          BlocBuilder<WalletCubit, WalletState>(
+            builder: (context, walletState) {
+              final coins = walletState.wallet?.coins ?? 0;
               return Padding(
                 padding: const EdgeInsets.only(right: 16),
                 child: Container(
@@ -187,7 +187,7 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen> with SingleTickerProv
                           size: 16, color: AppColors.primaryColor),
                       const SizedBox(width: 6),
                       Text(
-                        '$balance Credits',
+                        '$coins Coins',
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,

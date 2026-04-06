@@ -1,5 +1,5 @@
 import 'package:clear_task/core/utils/helper_functions/ad_helper.dart';
-import 'package:clear_task/presentation/blocs/credit/credit_cubit.dart';
+import 'package:clear_task/presentation/blocs/wallet/wallet_cubit.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 /// Manages loading and showing rewarded ads for bonus AI uses.
@@ -35,7 +35,7 @@ class RewardedAdService {
   /// Calls [onAdDismissed] when the ad is closed (regardless of reward).
   static void show({
     required String userId,
-    required CreditCubit creditCubit,
+    required WalletCubit walletCubit,
     void Function()? onRewardSuccess,
     void Function()? onAdDismissed,
     void Function()? onAdNotReady,
@@ -62,8 +62,8 @@ class RewardedAdService {
 
     _rewardedAd!.show(
       onUserEarnedReward: (ad, reward) {
-        // Grant 1 AI credit (configurable)
-        creditCubit.rewardFromAd(userId, 1);
+        // Grant 15 coins for watching the ad
+        walletCubit.rewardFromAd(userId, 15);
         onRewardSuccess?.call();
       },
     );

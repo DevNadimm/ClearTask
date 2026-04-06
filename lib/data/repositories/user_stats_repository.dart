@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clear_task/data/models/user_profile_model.dart';
+import 'package:clear_task/data/repositories/wallet_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -68,6 +69,10 @@ class UserStatsRepository {
       if (leveledUp) {
         _levelUpController.add(newLevel);
         debugPrint('🎊 LEVEL UP! New Level: $newLevel');
+        
+        // Award 25 Coins Level Up Bonus
+        debugPrint('🎁 Awarding 25 Coins Level Up Bonus');
+        await WalletRepository().addCoins(_uid!, 25);
       }
 
       return leveledUp;

@@ -1,6 +1,6 @@
 import 'package:clear_task/core/utils/theme/theme.dart';
 import 'package:clear_task/presentation/blocs/auth/auth_cubit.dart';
-import 'package:clear_task/presentation/blocs/credit/credit_cubit.dart';
+import 'package:clear_task/presentation/blocs/wallet/wallet_cubit.dart';
 import 'package:clear_task/presentation/blocs/sync/sync_cubit.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
 import 'package:clear_task/presentation/blocs/task/task_event.dart';
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => ThemeCubit()),
         BlocProvider(create: (_) => AuthCubit()),
         BlocProvider(create: (_) => SyncCubit()),
-        BlocProvider(create: (_) => CreditCubit()),
+        BlocProvider(create: (_) => WalletCubit()),
       ],
       child: Builder(
         builder: (ctx) {
@@ -42,13 +42,10 @@ class MyApp extends StatelessWidget {
               if (authState.status == AuthStatus.authenticated) {
                 final userId = authState.user!.uid;
                 context.read<SyncCubit>().sync(userId);
-                context.read<CreditCubit>().fetchCredit(userId);
-                // 1. Grant daily credit (1 Credit)
-                context.read<CreditCubit>().checkAndGrantDaily(userId);
-                context.read<CreditCubit>().checkAndGrantDaily(userId);
+                context.read<WalletCubit>().fetchWallet(userId);
               } else if (authState.status == AuthStatus.unauthenticated) {
                 context.read<SyncCubit>().clearUser();
-                context.read<CreditCubit>().clearCache();
+                context.read<WalletCubit>().clearCache();
               }
             },
             child: BlocBuilder<ThemeCubit, ThemeMode>(

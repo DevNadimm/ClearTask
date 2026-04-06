@@ -22,7 +22,7 @@ ThemeData darkTheme = ThemeData(
       return AppColors.darkSecondaryFont;
     }),
     trackColor: WidgetStateProperty.resolveWith((states) {
-      if (states.contains(WidgetState.selected)) return AppColors.primaryColor.withOpacity(0.4);
+      if (states.contains(WidgetState.selected)) return AppColors.primaryColor.withValues(alpha: 0.4);
       return AppColors.darkInputBorder;
     }),
   ),
@@ -51,7 +51,7 @@ ThemeData lightTheme = ThemeData(
       return AppColors.lightSecondaryFont;
     }),
     trackColor: WidgetStateProperty.resolveWith((states) {
-      if (states.contains(WidgetState.selected)) return AppColors.primaryColor.withOpacity(0.4);
+      if (states.contains(WidgetState.selected)) return AppColors.primaryColor.withValues(alpha: 0.4);
       return AppColors.lightInputBorder;
     }),
   ),
