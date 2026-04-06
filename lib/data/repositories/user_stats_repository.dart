@@ -78,11 +78,11 @@ class UserStatsRepository {
   }
 
   String _getRankForLevel(int level) {
-    if (level <= 5) return 'Novice';
-    if (level <= 10) return 'Time Boxer';
-    if (level <= 20) return 'Executioner';
-    if (level <= 50) return 'Master of Flow';
-    return 'Zen Master';
+    if (level <= 5) return 'Starter';
+    if (level <= 10) return 'Rising';
+    if (level <= 20) return 'Doer';
+    if (level <= 50) return 'Achiever';
+    return 'Legend';
   }
 
   /// Visual celebration for completing daily goal (no XP to prevent farming).

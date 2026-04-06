@@ -19,7 +19,7 @@ class UserProfileModel {
     required this.createdAt,
     this.xp = 0,
     this.level = 1,
-    this.rankTitle = 'Novice',
+    this.rankTitle = 'Starter',
     this.lastLoginBonusDate,
   });
 
@@ -34,7 +34,7 @@ class UserProfileModel {
           : DateTime.now(),
       xp: json['xp'] ?? 0,
       level: json['level'] ?? 1,
-      rankTitle: json['rankTitle'] ?? 'Novice',
+      rankTitle: json['rankTitle'] ?? 'Starter',
       lastLoginBonusDate: json['lastLoginBonusDate'],
     );
   }
