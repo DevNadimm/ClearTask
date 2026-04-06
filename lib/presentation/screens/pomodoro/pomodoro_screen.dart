@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:clear_task/core/constants/colors.dart';
+import 'package:clear_task/core/utils/widgets/custom_container.dart';
 import 'package:clear_task/presentation/blocs/pomodoro/pomodoro_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -341,15 +342,8 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                   const SizedBox(height: 40),
 
                   // ── Pomodoro count dots ─────────────────────────────────
-                  Container(
+                  CustomContainer(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    decoration: BoxDecoration(
-                      color: context.cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: context.inputBorderColor,
-                      ),
-                    ),
                     child: Column(
                       children: [
                         Text(
@@ -425,16 +419,8 @@ class _PomodoroBodyState extends State<_PomodoroBody>
                   // ── Duration config chips (only in idle) ────────────────
                   if (state.phase == PomodoroPhase.idle) ...[
                     const SizedBox(height: 24),
-                    Container(
+                    CustomContainer(
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: context.cardColor,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: context.inputBorderColor,
-                          width: 1,
-                        ),
-                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

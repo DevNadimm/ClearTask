@@ -50,6 +50,10 @@ extension ThemeColors on BuildContext {
       _isDark ? AppColors.darkCard : AppColors.lightCard;
   Color get primaryFontColor =>
       _isDark ? AppColors.darkPrimaryFont : AppColors.lightPrimaryFont;
+  Color get cardPrimaryFontColor =>
+      _isDark ? AppColors.lightPrimaryFont : AppColors.darkPrimaryFont;
+  Color get cardSecondaryFontColor =>
+      _isDark ? AppColors.lightSecondaryFont : AppColors.darkSecondaryFont;
   Color get secondaryFontColor =>
       _isDark ? AppColors.darkSecondaryFont : AppColors.lightSecondaryFont;
   Color get buttonFontColor =>

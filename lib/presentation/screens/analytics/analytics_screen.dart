@@ -1,4 +1,6 @@
 import 'package:clear_task/core/constants/colors.dart';
+import 'package:clear_task/core/utils/widgets/custom_container.dart';
+import 'package:clear_task/core/utils/widgets/custom_header.dart';
 import 'package:clear_task/data/models/task_model.dart';
 import 'package:clear_task/data/models/user_profile_model.dart';
 import 'package:clear_task/data/repositories/user_stats_repository.dart';
@@ -12,7 +14,6 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hugeicons/hugeicons.dart';
-
 import 'package:clear_task/presentation/widgets/level_up_dialog.dart';
 import 'dart:async';
 
@@ -96,7 +97,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               final profile = snapshot.data;
               
               return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -106,25 +107,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     ],
                     _buildSummaryRow(context, completedUnits, pendingUnits, scoreRate),
                     const SizedBox(height: 32),
-                    Text(
-                      'Weekly Activity',
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: context.primaryFontColor,
-                      ),
-                    ),
+                    const CustomHeader('Weekly Activity'),
                     const SizedBox(height: 16),
                     _buildWeeklyBarChart(context, tasks),
                     const SizedBox(height: 32),
-                    Text(
-                      'Category Breakdown',
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: context.primaryFontColor,
-                      ),
-                    ),
+                    const CustomHeader('Category Breakdown'),
                     const SizedBox(height: 16),
                     _buildCategoryPieChart(context, tasks),
                     const SizedBox(height: 40),
@@ -143,21 +130,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     double progress = currentXpInLevel / 100.0;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primaryColor, AppColors.primaryColor.withValues(alpha: 0.8)],
+          colors: [AppColors.primaryColor, AppColors.primaryColor.withValues(alpha: 0.9)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryColor.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,7 +153,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     style: GoogleFonts.poppins(
                       fontSize: 24,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: context.cardPrimaryFontColor,
                     ),
                   ),
                   Text(
@@ -181,7 +161,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: context.cardPrimaryFontColor.withValues(alpha: 0.9),
                     ),
                   ),
                 ],
@@ -189,10 +169,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
+                  color: context.cardPrimaryFontColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(HugeIcons.strokeRoundedCrown, color: Colors.white, size: 28),
+                child: Icon(HugeIcons.strokeRoundedCrown03, color: context.cardPrimaryFontColor, size: 28),
               ),
             ],
           ),
@@ -202,11 +182,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             children: [
               Text(
                 'XP Progress',
-                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: context.cardPrimaryFontColor),
               ),
               Text(
                 '$currentXpInLevel / 100 XP',
-                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: context.cardPrimaryFontColor),
               ),
             ],
           ),
@@ -216,8 +196,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 10,
-              backgroundColor: Colors.white.withValues(alpha: 0.2),
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+              backgroundColor: context.cardPrimaryFontColor.withValues(alpha: 0.2),
+              valueColor: AlwaysStoppedAnimation<Color>(context.cardPrimaryFontColor),
             ),
           ),
         ],
@@ -238,13 +218,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   Widget _buildSummaryCard(BuildContext context, String title, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: context.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(width: 1, color: context.inputBorderColor),
-      ),
+    return CustomContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -280,14 +254,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     List<BarChartGroupData> groups = AnalyticsService.getWeeklyData(tasks, context, AppColors.primaryColor);
     double maxCount = AnalyticsService.getMaxWeeklyScore(tasks);
 
-    return Container(
+    return CustomContainer(
       height: 250,
       padding: const EdgeInsets.only(top: 24, bottom: 12, left: 8, right: 8),
-      decoration: BoxDecoration(
-        color: context.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(width: 1, color: context.inputBorderColor),
-      ),
       child: BarChart(
         BarChartData(
           barGroups: groups,
@@ -334,13 +303,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final Map<String, double> categories = AnalyticsService.getCategoryBreakdown(tasks);
 
     if (categories.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(32),
-        decoration: BoxDecoration(
-          color: context.cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(width: 1, color: context.inputBorderColor),
-        ),
+      return CustomContainer(
         child: Center(
           child: Text(
             "Complete some tasks to see breakdown",
@@ -375,13 +338,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       i++;
     });
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: context.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(width: 1, color: context.inputBorderColor),
-      ),
+    return CustomContainer(
       child: Row(
         children: [
           SizedBox(

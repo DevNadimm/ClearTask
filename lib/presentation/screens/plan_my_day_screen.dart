@@ -183,7 +183,7 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen> with SingleTickerProv
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(HugeIcons.strokeRoundedAiBrain01,
+                      const Icon(HugeIcons.strokeRoundedCoins01,
                           size: 16, color: AppColors.primaryColor),
                       const SizedBox(width: 6),
                       Text(
@@ -230,7 +230,7 @@ class _PlanMyDayScreenState extends State<PlanMyDayScreen> with SingleTickerProv
           }
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

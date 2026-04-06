@@ -1,5 +1,6 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/core/services/contact_service.dart';
+import 'package:clear_task/core/utils/widgets/custom_container.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,11 +24,10 @@ class DeveloperInfoScreen extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             const SizedBox(height: 20),
-            // Profile Section
             Stack(
               alignment: Alignment.center,
               children: [
@@ -75,14 +75,7 @@ class DeveloperInfoScreen extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            // About Section
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: context.cardColor,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: context.inputBorderColor, width: 1),
-              ),
+            CustomContainer(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -106,9 +99,7 @@ class DeveloperInfoScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 32),
-
-            // Social Section
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -118,7 +109,7 @@ class DeveloperInfoScreen extends StatelessWidget {
                   label: 'GitHub',
                   onTap: () => ContactService.openGithub(),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 16),
                 _buildSocialButton(
                   context: context,
                   icon: HugeIcons.strokeRoundedLinkedin01,
@@ -148,29 +139,27 @@ class DeveloperInfoScreen extends StatelessWidget {
     required String label,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        decoration: BoxDecoration(
-          color: context.cardColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: context.inputBorderColor, width: 1),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 24, color: AppColors.primaryColor),
-            const SizedBox(width: 10),
-            Text(
-              label,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: context.primaryFontColor,
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: CustomContainer(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 20, color: AppColors.primaryColor),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: context.primaryFontColor,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

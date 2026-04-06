@@ -289,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               ListTile(
                 leading: const Icon(HugeIcons.strokeRoundedCoins01,
-                    color: Colors.amber),
+                    color: AppColors.primaryColor),
                 title: Text('Rewards',
                     style:
                         GoogleFonts.poppins(color: context.primaryFontColor)),
@@ -300,18 +300,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.amber.withValues(alpha: 0.12),
+                        color: AppColors.primaryColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('$coins',
-                              style: GoogleFonts.poppins(
+                          Text(
+                            '$coins',
+                            style: GoogleFonts.poppins(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.amber,
-                              )),
+                                color: AppColors.primaryColor),
+                          ),
                         ],
                       ),
                     );

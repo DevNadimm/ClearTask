@@ -1,4 +1,5 @@
 import 'package:clear_task/core/constants/colors.dart';
+import 'package:clear_task/core/utils/widgets/custom_container.dart';
 import 'package:clear_task/presentation/blocs/auth/auth_cubit.dart';
 import 'package:clear_task/presentation/blocs/sync/sync_cubit.dart';
 import 'package:clear_task/presentation/blocs/task/task_bloc.dart';
@@ -45,9 +46,7 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
             color: context.primaryFontColor,
           ),
         ),
-        title: const Text(
-          'Cloud Backup'
-        ),
+        title: const Text('Cloud Backup'),
       ),
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, authState) {
@@ -77,89 +76,80 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
     final user = authState.user!;
 
     return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           const SizedBox(height: 20),
-          // Premium Profile Card
-          _buildPremiumCard(
-            child: Column(
-              children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
+          Column(
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.primaryColor.withValues(alpha: 0.5),
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: Container(
                       width: 90,
                       height: 90,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.primaryColor.withValues(alpha: 0.5),
-                          width: 2,
-                        ),
-                      ),
+                      color: AppColors.primaryColor.withValues(alpha: 0.1),
+                      child: user.photoURL != null
+                          ? CachedNetworkImage(
+                              imageUrl: user.photoURL!,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor: context.inputBorderColor
+                                    .withValues(alpha: 0.2),
+                                highlightColor: context.cardColor,
+                                child: Container(color: Colors.white),
+                              ),
+                              errorWidget: (context, url, error) => const Icon(
+                                Icons.person_rounded,
+                                size: 45,
+                                color: AppColors.primaryColor,
+                              ),
+                            )
+                          : const Icon(Icons.person_rounded,
+                              size: 45, color: AppColors.primaryColor),
                     ),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        color: AppColors.primaryColor.withValues(alpha: 0.1),
-                        child: user.photoURL != null
-                            ? CachedNetworkImage(
-                                imageUrl: user.photoURL!,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) =>
-                                    Shimmer.fromColors(
-                                  baseColor: context.inputBorderColor
-                                      .withValues(alpha: 0.2),
-                                  highlightColor: context.cardColor,
-                                  child: Container(color: Colors.white),
-                                ),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(
-                                  Icons.person_rounded,
-                                  size: 40,
-                                  color: AppColors.primaryColor,
-                                ),
-                              )
-                            : const Icon(Icons.person_rounded,
-                                size: 40, color: AppColors.primaryColor),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  user.displayName ?? 'User',
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: context.primaryFontColor,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                user.displayName ?? 'User',
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: context.primaryFontColor,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  user.email ?? '',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: context.secondaryFontColor,
-                    fontWeight: FontWeight.w400,
-                  ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                user.email ?? '',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: context.secondaryFontColor,
+                  fontWeight: FontWeight.w400,
                 ),
-              ],
-            ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
 
-          const SizedBox(height: 24),
-
-          // Sync Section Header
-          _buildSectionHeader(context, "Cloud Sync"),
-
-          const SizedBox(height: 12),
+          const SizedBox(height: 32),
 
           // Sync Status Card
           BlocBuilder<SyncCubit, SyncState>(
@@ -171,10 +161,19 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
                   ? 'Last synced: ${_formatDateTime(lastSynced)}'
                   : 'Never synced';
 
-              return _buildPremiumCard(
-                padding: const EdgeInsets.all(20),
+              return CustomContainer(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      'Cloud Sync',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: context.primaryFontColor,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     Row(
                       children: [
                         _buildStatusIndicator(status),
@@ -343,40 +342,6 @@ class _CloudBackupScreenState extends State<CloudBackupScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  // ── Components ────────────────────────────────────────────────────────────
-
-  Widget _buildPremiumCard({required Widget child, EdgeInsets? padding}) {
-    return Container(
-      width: double.infinity,
-      padding: padding ?? const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: context.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: context.inputBorderColor,
-          width: 1,
-        ),
-      ),
-      child: child,
-    );
-  }
-
-  Widget _buildSectionHeader(BuildContext context, String title) {
-    return Row(
-      children: [
-        Text(
-          title.toUpperCase(),
-          style: GoogleFonts.poppins(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.2,
-            color: context.secondaryFontColor,
-          ),
-        ),
-      ],
     );
   }
 

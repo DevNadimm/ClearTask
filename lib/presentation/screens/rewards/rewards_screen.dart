@@ -1,5 +1,7 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/core/services/auth_service.dart';
+import 'package:clear_task/core/utils/widgets/custom_container.dart';
+import 'package:clear_task/core/utils/widgets/custom_header.dart';
 import 'package:clear_task/data/models/user_profile_model.dart';
 import 'package:clear_task/data/repositories/user_stats_repository.dart';
 import 'package:clear_task/data/services/rewarded_ad_service.dart';
@@ -123,8 +125,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                 },
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -138,16 +139,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                       _buildWalletAndEarnCard(context, coins),
 
                       const SizedBox(height: 32),
-
-                      // ── Wallet Statistics ──
-                      Text(
-                        'Wallet Statistics',
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: context.primaryFontColor,
-                        ),
-                      ),
+                      const CustomHeader('Wallet Statistics'),
                       const SizedBox(height: 16),
                       Row(
                         children: [
@@ -191,24 +183,14 @@ class _RewardsScreenState extends State<RewardsScreen> {
     double progress = currentXpInLevel / 100.0;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            AppColors.primaryColor,
-            AppColors.primaryColor.withValues(alpha: 0.85)
-          ],
+          colors: [AppColors.primaryColor, AppColors.primaryColor.withValues(alpha: 0.9)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryColor.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,7 +206,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                     style: GoogleFonts.poppins(
                       fontSize: 24,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: context.cardPrimaryFontColor,
                     ),
                   ),
                   Text(
@@ -232,7 +214,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white.withValues(alpha: 0.92),
+                      color: context.cardPrimaryFontColor.withValues(alpha: 0.9),
                     ),
                   ),
                 ],
@@ -240,11 +222,10 @@ class _RewardsScreenState extends State<RewardsScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
+                  color: context.cardPrimaryFontColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(HugeIcons.strokeRoundedCrown,
-                    color: Colors.white, size: 28),
+                child: Icon(HugeIcons.strokeRoundedCrown03, color: context.cardPrimaryFontColor, size: 28),
               ),
             ],
           ),
@@ -254,17 +235,11 @@ class _RewardsScreenState extends State<RewardsScreen> {
             children: [
               Text(
                 'XP Progress',
-                style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white),
+                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: context.cardPrimaryFontColor),
               ),
               Text(
                 '$currentXpInLevel / 100 XP',
-                style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white),
+                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: context.cardPrimaryFontColor),
               ),
             ],
           ),
@@ -274,9 +249,8 @@ class _RewardsScreenState extends State<RewardsScreen> {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 10,
-              backgroundColor: Colors.white.withValues(alpha: 0.2),
-              valueColor:
-              const AlwaysStoppedAnimation<Color>(Colors.white),
+              backgroundColor: context.cardPrimaryFontColor.withValues(alpha: 0.2),
+              valueColor: AlwaysStoppedAnimation<Color>(context.cardPrimaryFontColor),
             ),
           ),
         ],
@@ -286,36 +260,25 @@ class _RewardsScreenState extends State<RewardsScreen> {
 
   // ── Combined Wallet + Earn Card ──
   Widget _buildWalletAndEarnCard(BuildContext context, int coins) {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.cardColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: context.inputBorderColor, width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return CustomContainer(
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Balance section ──
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Coin Balance',
                       style: GoogleFonts.poppins(
                         fontSize: 13,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                         color: context.secondaryFontColor,
                       ),
                     ),
@@ -323,7 +286,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.amber.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
                         HugeIcons.strokeRoundedCoins01,
@@ -333,15 +296,14 @@ class _RewardsScreenState extends State<RewardsScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
                       '$coins',
                       style: GoogleFonts.poppins(
-                        fontSize: 48,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 42,
+                        fontWeight: FontWeight.w700,
                         color: context.primaryFontColor,
                         letterSpacing: -2,
                         height: 1,
@@ -349,7 +311,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                     ),
                     const SizedBox(width: 6),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
+                      padding: const EdgeInsets.only(bottom: 2),
                       child: Text(
                         'coins',
                         style: GoogleFonts.poppins(
@@ -364,8 +326,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                 const SizedBox(height: 14),
                 Row(
                   children: [
-                    const Icon(HugeIcons.strokeRoundedAiMagic,
-                        size: 13, color: AppColors.primaryColor),
+                    const Icon(HugeIcons.strokeRoundedAiMagic, size: 13, color: AppColors.primaryColor),
                     const SizedBox(width: 6),
                     Text(
                       'Spend on AI Features',
@@ -377,10 +338,11 @@ class _RewardsScreenState extends State<RewardsScreen> {
                     ),
                     const Spacer(),
                     Text(
-                      'Plan My Day · AI Tasks',
+                      'Plan My Day · AI Subtasks',
                       style: GoogleFonts.poppins(
                         fontSize: 11,
                         color: context.secondaryFontColor,
+                        letterSpacing: -0.2,
                       ),
                     ),
                   ],
@@ -391,9 +353,8 @@ class _RewardsScreenState extends State<RewardsScreen> {
 
           Divider(color: context.inputBorderColor, height: 1, thickness: 1),
 
-          // ── Earn more section ──
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+            padding: const EdgeInsets.fromLTRB(16, 12, 20, 8),
             child: Text(
               'Earn More Coins',
               style: GoogleFonts.poppins(
@@ -405,7 +366,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
           ),
 
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Column(
               children: [
                 _ActionCard(
@@ -416,7 +377,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
                   onTap: _handleDailyClaim,
                   iconColor: Colors.blueAccent,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 _ActionCard(
                   title: 'Watch & Earn',
                   subtitle: 'Watch a short video to support & get 15 coins.',
@@ -437,13 +398,7 @@ class _RewardsScreenState extends State<RewardsScreen> {
   // ── Summary Card ──
   Widget _buildSummaryCard(BuildContext context, String title, String value,
       IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: context.cardColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(width: 1, color: context.inputBorderColor),
-      ),
+    return CustomContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -506,30 +461,20 @@ class _ActionCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: isEnabled ? onTap : null,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: context.cardColor,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isEnabled
-                ? context.inputBorderColor
-                : context.dividerColor.withValues(alpha: 0.1),
-            width: 1,
-          ),
-        ),
+      child: CustomContainer(
+        padding: const EdgeInsets.all(14),
+        borderRadius: BorderRadius.circular(8),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: iconColor, size: 24),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -565,7 +510,7 @@ class _ActionCard extends StatelessWidget {
               )
             else
               Icon(
-                HugeIcons.strokeRoundedCircleArrowRight01,
+                HugeIcons.strokeRoundedArrowRight01,
                 color: isEnabled
                     ? AppColors.primaryColor
                     : context.secondaryFontColor.withValues(alpha: 0.3),
