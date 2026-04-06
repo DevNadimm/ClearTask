@@ -1,33 +1,40 @@
-# ⚡ ClearTask - Intelligent & Aesthetic Task Management
+# ⚡ ClearTask: AI Planner & ToDo
 
-ClearTask is a stunning, clean, and powerful task management application built with **Flutter**, designed to help you organize your life with ease. It combines modern design principles with advanced productivity tools like **AI-powered subtask generation**, **Pomodoro timers**, and **Cloud synchronization**.
+ClearTask is a premium, AI-driven task management application that transforms productivity into a rewarding journey. Built with **Flutter**, it combines cutting-edge AI planning with an immersive **RPG-style economy** to help you conquer your day, one task at a time.
+
+---
+
+## 🤖 AI-First Productivity
+
+ClearTask leverages advanced Large Language Models to act as your personal executive assistant.
+
+*   **📅 Plan My Day**: Analyzes your pending tasks, priorities, and deadlines to generate a smart, time-blocked schedule. Powered by **Gemini 1.5 Flash** with **Groq (Llama 3.3 70B)** fallback.
+*   **🧩 AI Subtask Generation**: Instantly breaks down complex goals into manageable, actionable steps.
+*   **🧠 Context-Aware Logic**: Intelligent categorization and prioritization that adapts to your unique workflow.
+
+---
+
+## 🎮 The Productivity RPG (Clear Economy)
+
+Turn your to-do list into a level-up experience. Stay productive to earn rewards and unlock premium features.
+
+*   **💰 Clear Coins & XP**: Earn coins and experience points for every task you complete and ogni daily login.
+*   **🏆 Leveling System**: Move up the ranks as you accumulate XP. From "Newbie" to "Productivity Master".
+*   **💳 User Wallet**: A centralized hub to track your earnings, bonuses, and feature unlocks.
+*   **🎁 Engagement Bonuses**: Get rewarded for consistency with signup bonuses and daily rewards.
 
 ---
 
 ## 🚀 Key Features
 
-*   **🤖 AI-Powered Subtasks**: Break down complex tasks instantly using Google Generative AI (Gemini).
-*   **☁️ Cloud Backup & Sync**: Keep your tasks safe and synced across devices with Firebase & Google Sign-In.
-*   **⏲️ Pomodoro Timer**: Stay focused and productive with a build-in Pomodoro timer for your tasks.
-*   **📝 Rich Text Notes**: Take detailed notes for each task using a powerful rich-text editor (`flutter_quill`).
-*   **📈 Analytics Dashboard**: Visualize your productivity trends with detailed completion charts.
-*   **📅 Plan My Day**: A dedicated workflow to prioritize and organize your daily schedule.
-*   **🎟 AI Usage & Rewards**: Unlock AI features through reward-based interactions using Google Mobile Ads.
-*   **🌿 Subtask Management**: Automatic parent-task completion when all subtasks are finished.
-*   **🔔 Smart Notifications**: Reliable local reminders that update dynamically based on your schedule.
-*   **🎉 Celebration View**: Celebrate your wins with an immersive full-screen animation upon task completion.
-*   **🎨 Dynamic Themes**: Seamless Light and Dark mode transitions that adapt to your preferences.
-
----
-
-## 📱 User Interface
-
-### Smart Task Filtering
-*   **Today** - Focus on what's urgent.
-*   **Tomorrow** - Plan ahead.
-*   **Upcoming** - Long-term goals.
-*   **Anytime** - Flexible tasks without deadlines.
-*   **Completed** - Review your achievements.
+*   **☁️ Cloud Sync & Backup**: Secure your data with Firebase Firestore and Google Sign-In.
+*   **🗓️ Google Calendar**: Bidirectional synchronization to keep your schedule aligned.
+*   **⏲️ Pomodoro Focus**: Integrated focus timer to maximize deep work sessions.
+*   **📈 Advanced Analytics**: Visualize your productivity trends with interactive completion charts.
+*   **✍️ Rich Text Notes**: Take detailed documentation for any task using `flutter_quill`.
+*   **🔔 Smart Notifications**: Dynamic, schedule-aware reminders that keep you on track.
+*   **🏗️ Parent-Instance Model**: Advanced architecture for complex task dependencies.
+*   **🎉 Celebration Dialog**: Celebrate your wins with an interactive dialog and immersive sound effects upon completion.
 
 ---
 
@@ -42,7 +49,7 @@ ClearTask follows **Clean Architecture** principles to separate concerns and ens
 | **BLoC/Cubit** | Advanced State Management & Logic |
 | **GetX** | Routing, Overlays, and Snackbars |
 | **Firebase** | Authentication & Cloud Synchronization |
-| **Gemini AI** | Intelligent Subtask Generation |
+| **AI Models** | Intelligent Planning (Gemini & Groq) & Subtask Generation |
 | **SQLite (sqflite)**| Persistent Local Storage (Offline-first) |
 | **Google Ads** | Monetization & Feature Unlocks |
 | **FL Chart** | Data Visualization & Analytics |
@@ -58,15 +65,6 @@ lib/
 
 ---
 
-## 🚧 Future Roadmap
-
-*   📅 **Calendar Integration**: Google & Apple Calendar sync for scheduling.
-*   👥 **Collaborative Tasks**: Share task lists with friends or colleagues.
-*   🏷 **Voice Input**: Create tasks using AI-powered voice commands.
-*   ⌚ **Smartwatch Support**: Manage tasks from your wrist (WearOS/watchOS).
-
----
-
 ## 🧑‍💻 Author
 
 **Nadim Chowdhury**
@@ -74,5 +72,10 @@ lib/
 *   🧠 Passionate Flutter Developer
 *   🎓 BSc in CSE, Port City International University
 *   🔗 [LinkedIn](https://www.linkedin.com/in/devnadimm/)
-*   📬 [nadimm.dev@gmail.com](mailto:nadimchowdhury87@gmail.com)
+*   📬 [nadimm.dev@gmail.com](mailto:nadimm.dev@gmail.com)
 *   💻 [GitHub](https://github.com/DevNadimm)
+
+---
+
+> [!TIP]
+> This application is constantly evolving. Keep an eye on our [Issues](https://github.com/DevNadimm/clear_task/issues) for upcoming features!
