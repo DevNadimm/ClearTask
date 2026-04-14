@@ -46,11 +46,9 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await _authService.signInWithGoogle();
     } on FirebaseAuthException catch (e) {
-      emit(state.copyWith(
-          status: AuthStatus.error, errorMessage: e.message));
+      emit(state.copyWith(status: AuthStatus.error, errorMessage: e.message));
     } catch (e) {
-      emit(state.copyWith(
-          status: AuthStatus.error, errorMessage: e.toString()));
+      emit(state.copyWith(status: AuthStatus.error, errorMessage: e.toString()));
     }
   }
 
