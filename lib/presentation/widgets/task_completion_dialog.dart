@@ -175,6 +175,7 @@ class _TaskCompletionDialogState extends State<TaskCompletionDialog> {
                 'assets/animations/celebration.json',
                 repeat: false,
                 animate: true,
+                frameRate: const FrameRate(30),
               ),
             ),
           ),

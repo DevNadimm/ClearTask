@@ -133,6 +133,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
               child: Lottie.asset(
                 'assets/animations/celebration.json',
                 controller: _controller,
+                frameRate: const FrameRate(30),
                 onLoaded: (composition) {
                   _controller.duration = composition.duration;
                   _controller.forward();

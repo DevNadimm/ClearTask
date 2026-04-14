@@ -108,6 +108,7 @@ class _DailyBonusDialogState extends State<DailyBonusDialog> {
               child: Lottie.asset(
                 'assets/animations/celebration.json',
                 repeat: false,
+                frameRate: const FrameRate(30),
               ),
             ),
           ),

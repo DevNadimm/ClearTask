@@ -108,6 +108,7 @@ class _SignupBonusDialogState extends State<SignupBonusDialog> {
               child: Lottie.asset(
                 'assets/animations/celebration.json',
                 repeat: false,
+                frameRate: const FrameRate(30),
               ),
             ),
           ),
