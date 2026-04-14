@@ -1,8 +1,10 @@
 import 'package:clear_task/core/constants/colors.dart';
 import 'package:clear_task/data/datasources/preferences_helper.dart';
+import 'package:clear_task/presentation/blocs/auth/auth_cubit.dart';
 import 'package:clear_task/presentation/screens/home_screen.dart';
 import 'package:clear_task/presentation/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -34,10 +36,22 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   Future<void> _navigateToNextScreen() async {
     final PreferencesHelper prefHelper = PreferencesHelper();
-    final futurePrefs = prefHelper.isFirstTimeUser();
+    
+    // Start fetching preferences and auth state in parallel
+    final firstTimeFuture = prefHelper.isFirstTimeUser();
+    
+    // We want to wait for at least 2 seconds for the animation/branding
+    final minDelayFuture = Future.delayed(const Duration(seconds: 2));
 
-    await Future.delayed(const Duration(seconds: 2));
-    final bool isFirstTimeUser = await futurePrefs;
+    // Wait for AuthCubit to determine the initial session status (restored or null)
+    final authCubit = context.read<AuthCubit>();
+    if (authCubit.state.status == AuthStatus.initial) {
+      await authCubit.stream.firstWhere((state) => state.status != AuthStatus.initial);
+    }
+
+    // Now gather results
+    await minDelayFuture;
+    final bool isFirstTimeUser = await firstTimeFuture;
 
     if (!mounted) return;
 
