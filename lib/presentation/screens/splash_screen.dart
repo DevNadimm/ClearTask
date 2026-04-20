@@ -1,4 +1,5 @@
 import 'package:clear_task/core/constants/colors.dart';
+import 'package:clear_task/core/services/app_update_service.dart';
 import 'package:clear_task/data/datasources/preferences_helper.dart';
 import 'package:clear_task/presentation/blocs/auth/auth_cubit.dart';
 import 'package:clear_task/presentation/screens/home_screen.dart';
@@ -31,34 +32,51 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
 
-    _navigateToNextScreen();
+    // Consolidated navigation logic into a single post-frame callback
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Check for updates first
+      await AppUpdateService.checkForUpdate(context);
+      // Then proceed to check auth and navigate
+      if (mounted) {
+        _navigateToNextScreen();
+      }
+    });
   }
 
   Future<void> _navigateToNextScreen() async {
     final PreferencesHelper prefHelper = PreferencesHelper();
     
-    // Start fetching preferences and auth state in parallel
+    // 1. Start fetching preferences and branding delay in parallel
     final firstTimeFuture = prefHelper.isFirstTimeUser();
-    
-    // We want to wait for at least 2 seconds for the animation/branding
     final minDelayFuture = Future.delayed(const Duration(seconds: 2));
 
-    // Wait for AuthCubit to determine the initial session status (restored or null)
+    // 2. Wait for AuthCubit to determine the initial session status
     final authCubit = context.read<AuthCubit>();
     if (authCubit.state.status == AuthStatus.initial) {
       await authCubit.stream.firstWhere((state) => state.status != AuthStatus.initial);
     }
 
-    // Now gather results
-    await minDelayFuture;
+    // 3. Gather all results
+    final bool isAuthenticated = authCubit.state.status == AuthStatus.authenticated;
     final bool isFirstTimeUser = await firstTimeFuture;
+    
+    // Ensure branding animation has shown for at least 2s
+    await minDelayFuture;
 
     if (!mounted) return;
 
-    if (isFirstTimeUser) {
+    // 4. Decision Logic
+    if (isAuthenticated) {
+      // Priority 1: User is already logged in -> Go Home
+      // (Even if it's technically their "first time", if they are authenticated, they should go to Home)
+      if (isFirstTimeUser) await prefHelper.setUserVisited();
+      Get.offAll(() => const HomeScreen());
+    } else if (isFirstTimeUser) {
+      // Priority 2: Unauthenticated and New User -> Welcome/Login
       await prefHelper.setUserVisited();
       Get.offAll(() => const WelcomeScreen());
     } else {
+      // Priority 3: Unauthenticated but Returning User -> Home (Skip mode)
       Get.offAll(() => const HomeScreen());
     }
   }

@@ -1,4 +1,5 @@
 import 'package:clear_task/core/constants/colors.dart';
+import 'package:clear_task/data/datasources/preferences_helper.dart';
 import 'package:clear_task/presentation/blocs/auth/auth_cubit.dart';
 import 'package:clear_task/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -23,8 +24,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<AuthCubit, AuthState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state.status == AuthStatus.authenticated) {
+            // Fail-safe: Ensure the first-time user flag is cleared upon login
+            await PreferencesHelper().setUserVisited();
             Get.offAll(() => const HomeScreen());
           }
         },

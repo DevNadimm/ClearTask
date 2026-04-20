@@ -154,7 +154,7 @@ class HomeDrawerColumn extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32),
           child: Text(
-            'Version 1.1.0',
+            'Version 1.1.2',
             style: GoogleFonts.poppins(color: context.secondaryFontColor, fontSize: 12),
           ),
         ),
