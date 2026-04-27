@@ -35,8 +35,8 @@ android {
         applicationId "com.codion_labs.cleartask"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = 5
-        versionName = "1.1.2"
+        versionCode = 6
+        versionName = "1.1.3"
         multiDexEnabled = true
     }
 

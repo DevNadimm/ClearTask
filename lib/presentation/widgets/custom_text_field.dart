@@ -19,6 +19,7 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon,
     this.validator,
     this.obscureText = false,
+    this.labelAction,
   });
 
   final String label;
@@ -35,6 +36,7 @@ class CustomTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final FormFieldValidator? validator;
   final bool obscureText;
+  final Widget? labelAction;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +64,10 @@ class CustomTextField extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+            if (labelAction != null) ...[
+              const Spacer(),
+              labelAction!,
+            ],
           ],
         ),
         const SizedBox(height: 8),

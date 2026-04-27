@@ -53,6 +53,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   final List<Subtask> _subtasksToDelete = [];
 
   bool _isGeneratingSubtasks = false;
+  bool _isFixingGrammar = false;
   String _selectedPriority = 'none';
 
   /// Rich text note stored as Delta JSON string.
@@ -280,6 +281,101 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     }
   }
 
+  Future<void> _fixGrammar() async {
+    final messenger = ScaffoldMessenger.of(context);
+
+    if (title.text.trim().isEmpty) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text("Please enter a task title first to fix grammar.", style: GoogleFonts.poppins(color: Colors.white)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    final authCubit = context.read<AuthCubit>();
+    final walletCubit = context.read<WalletCubit>();
+
+    if (authCubit.state.status != AuthStatus.authenticated) {
+      AiLimitDialog.show(context);
+      return;
+    }
+
+    final coins = walletCubit.state.wallet?.coins ?? 0;
+    if (coins < 3) {
+      AiLimitDialog.show(context);
+      return;
+    }
+
+    setState(() => _isFixingGrammar = true);
+
+    try {
+      final fixedTitle = await AiService.fixGrammar(title.text);
+
+      if (fixedTitle.isNotEmpty && fixedTitle != title.text) {
+        // Only spend coins if generation was successful and title changed
+        final spent = await walletCubit.spendCoins(authCubit.state.user!.uid, 3);
+        if (!spent) {
+          if (mounted) {
+            AiLimitDialog.show(context);
+            setState(() => _isFixingGrammar = false);
+          }
+          return;
+        }
+
+        setState(() {
+          title.text = fixedTitle;
+        });
+
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text("Grammar fixed! Used 3 coins.",
+                style: GoogleFonts.poppins(color: Colors.white)),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      } else {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text("Title is already grammatically correct.",
+                style: GoogleFonts.poppins(color: Colors.white)),
+            backgroundColor: AppColors.primaryColor,
+          ),
+        );
+      }
+    } on NoInternetException catch (e) {
+      debugPrint(e.toString());
+      messenger.showSnackBar(
+        SnackBar(
+          content:
+              Text(e.message, style: GoogleFonts.poppins(color: Colors.white)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } on AiServiceException catch (e) {
+      debugPrint(e.toString());
+      messenger.showSnackBar(
+        SnackBar(
+          content:
+              Text(e.message, style: GoogleFonts.poppins(color: Colors.white)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text("Failed to fix grammar. Please try again.",
+              style: GoogleFonts.poppins(color: Colors.white)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isFixingGrammar = false);
+    }
+  }
+
   // ── Submit ─────────────────────────────────────────────────────────────────
 
   void _submitTask() async {
@@ -392,6 +488,32 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                 hintText: "Enter your title",
                 validationLabel: "Title",
                 isRequired: true,
+                labelAction: _isFixingGrammar
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.primaryColor),
+                        ),
+                      )
+                    : TextButton.icon(
+                        onPressed: _fixGrammar,
+                        icon: HugeIcon(
+                            icon: HugeIcons.strokeRoundedAiMagic,
+                            size: 18,
+                            color: Colors.amber.shade600),
+                        label: Text("Fix Grammar",
+                            style: GoogleFonts.poppins(
+                                fontSize: 13, fontWeight: FontWeight.w500)),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.amber.shade600,
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
               ),
               const SizedBox(height: 24),
               CustomTextField(
@@ -594,13 +716,24 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                       onPressed: _generateSubtasks,
                       icon: HugeIcon(icon: HugeIcons.strokeRoundedAiMagic, size: 18, color: Colors.amber.shade600),
                       label: Text("AI", style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500)),
-                      style: TextButton.styleFrom(foregroundColor: Colors.amber.shade600),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.amber.shade600,
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
                     ),
+                  const SizedBox(width: 12),
                   TextButton.icon(
                     onPressed: _addSubtaskField,
                     icon: const HugeIcon(icon: HugeIcons.strokeRoundedAdd01, size: 18, color: AppColors.primaryColor),
                     label: Text("Add", style: GoogleFonts.poppins(fontSize: 13)),
-                    style: TextButton.styleFrom(foregroundColor: AppColors.primaryColor),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.primaryColor,
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
                   ),
                 ],
               ),
